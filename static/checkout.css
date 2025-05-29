@@ -1,0 +1,262 @@
+/* Checkout Container */
+:root {
+	--poppins: 'Poppins', sans-serif;
+	--lato: 'Lato', sans-serif;
+
+	--light: #F9F9F9;
+	--navy: #28097e;
+	--light-blue: #CFE8FF;
+	--grey: #eee;
+	--dark-grey: #AAAAAA;
+	--dark: #342E37;
+	--red: #DB504A;
+	--yellow: #FFCE26;
+	--light-yellow: #FFF2C6;
+	--orange: #FD7238;
+	--light-orange: #FFE0D3;
+	--blue: #3573b9;
+}
+
+html {
+	overflow-x: hidden;
+}
+
+body.dark {
+	--light: #0C0C1E;
+	--grey: #060714;
+	--dark: #FBFBFB;
+}
+
+body {
+	background: var(--grey);
+	overflow-x: hidden;
+}
+
+.checkout-container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+/* Checkout Item */
+.checkout-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.checkout-item img {
+    width: 80px;
+    height: auto;
+    margin-right: 20px;
+    border-radius: 8px;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.price, .quantity, .item-total {
+    width: 100px;
+    text-align: right;
+}
+
+/* Checkout Summary */
+.checkout-summary {
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 2px solid #ddd;
+    text-align: right;
+}
+
+.checkout-summary p {
+    font-size: 1.1em;
+    margin: 5px 0;
+}
+
+/* Checkout Buttons */
+.checkout-btn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    background-color: #f53d2d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: block; /* Ensures button is treated as a block element */
+    margin-left: auto; /* Pushes the button to the right */
+    margin-right: 0; /* Ensures it aligns to the right edge */
+}
+
+
+.checkout-btn:hover {
+    background-color: #d83225;
+}
+
+.return-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    font-size: 1.1em;
+    background-color: #ccc;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.return-btn:hover {
+    background-color: #aaa;
+}
+
+/* Address and Payment Fields */
+.address-field, .payment-method {
+    margin-top: 20px;
+}
+
+.payment-method label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.payment-method select {
+    width: 100%;
+    padding: 8px 15px; /* Padding for dropdown */
+    border-radius: 6px; /* Rounded corners */
+    border: 1px solid var(--grey); /* Border color */
+    font-family: var(--poppins); /* Font family */
+    font-size: 14px; /* Font size */
+    background-color: var(--light); /* Background color */
+    color: var(--dark); /* Text color */
+    transition: border-color 0.3s ease; /* Smooth transition for border color */
+}
+
+.payment-method select:focus {
+    border-color: var(--navy); /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Modal Styles */
+#addressModal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black with transparency */
+    animation: fadeIn 0.3s ease; /* Smooth opening effect */
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px; /* Rounded corners */
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Close Button */
+.close {
+    color: #aaa;
+    float: right; /* Keep close button at the top right */
+    font-size: 28px; /* Font size for the close button */
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Form Label Styles */
+label {
+    font-family: var(--poppins);
+    font-size: 14px; /* Font size for labels */
+    color: var(--dark);
+    margin-top: 8px; /* Space above labels */
+}
+
+/* Input and Text Area Styles */
+input[type="text"],
+input[type="number"],
+textarea {
+    width: 100%; /* Full width for inputs */
+    padding: 5px; /* Padding inside inputs */
+    border: 1px solid var(--grey);
+    border-radius: 6px; /* Rounded corners for inputs */
+    font-family: var(--poppins);
+    font-size: 14px; /* Font size for inputs */
+    color: var(--dark);
+    background: var(--light);
+    margin-bottom: 10px; /* Space between inputs */
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus {
+    border-color: var(--navy); /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button Styles */
+button {
+    background-color: #d83225;
+    color: var(--light);
+    padding: 8px 15px; /* Padding for button */
+    border: none; /* No border */
+    border-radius: 6px; /* Rounded corners for button */
+    cursor: pointer;
+    font-family: var(--poppins);
+    font-size: 14px; /* Font size for button */
+    transition: background-color 0.3s ease; /* Transition for button hover */
+}
+
+button:hover {
+    background-color: #45a049; /* Darker blue on hover */
+}
+
+/* Address and Payment Dropdowns */
+select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    font-family: var(--poppins);
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--light);
+    margin-bottom: 10px;
+    transition: border-color 0.3s ease;
+}
+
+select:focus {
+    border-color: var(--navy);
+    outline: none;
+}
+
+
+/* Animation for Modal Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}

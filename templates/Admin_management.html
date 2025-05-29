@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Boxicons -->
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- My CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='admin_management.css') }}">
+
+	
+	<title>Pethub</title>
+</head>
+<body>
+
+
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="#" class="brand">
+			<img src="../static/assets/images/logo.png" alt="Logo" style="width: 230px; height: auto; display: block; margin: 10 auto;">
+			<span class="text"></span>
+		</a>
+		<ul class="side-menu top">
+			<li>
+				<a href="{{ url_for('admin_dashboard') }}">
+					<i class='bx bxs-dashboard' ></i>
+					<span class="text">Dashboard</span>
+				</a>
+			</li>
+			<li class="active">
+				<a href="{{ url_for('admin_management') }}">
+					<i class='bx bxs-shopping-bag-alt' ></i>
+					<span class="text">Management</span>
+				</a>
+			</li>			
+		</ul>
+		<ul class="side-menu">
+			<li>
+				<form action="{{ url_for('logout') }}" method="POST">
+                    <button type="submit" class="logout">
+                        <i class='bx bxs-log-out-circle'></i>
+                        <span class="text">Logout</span>
+                    </button>
+                </form>
+			</li>
+		</ul>
+	</section>
+	<!-- SIDEBAR -->
+
+
+
+	<!-- CONTENT -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu' ></i>
+			<a href="#" class="nav-link"></a>
+			<form action="#">
+				<div class="form-input">
+					<input type="search" placeholder="Search...">
+					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+				</div>
+			</form>
+			<input type="checkbox" id="switch-mode" hidden>
+			<label for="switch-mode" class="switch-mode"></label>
+			<a href="#" class="notification" onclick="toggleDropdown(event)">
+				<i class='bx bxs-bell'></i>
+				<span class="num" id="notificationCount">0</span>
+			</a>
+			
+			<!-- Custom Dropdown Modal -->
+			<div class="custom-dropdown" id="notificationDropdown">
+				<div class="dropdown-header">
+					<h5>Notifications</h5>
+				</div>
+				<ul id="notificationList" class="list-group">
+					<li class="list-group-item">No new notifications.</li>
+				</ul>
+			</div>
+
+
+		</nav>
+		<!-- NAVBAR -->
+
+		<!-- MAIN -->
+		<main>
+			<div class="head-title">
+				<div class="left">
+					<h1>Management</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Management</a>
+						</li>
+						<li><i class='bx bx-chevron-right'></i></li>
+						<li>
+							<a class="active" href="#">Home</a>
+						</li>
+					</ul>
+				</div>
+				<div>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+						{% if messages %}
+							<ul>
+								{% for category, message in messages %}
+									<li class="{{ category }}">{{ message }}</li>
+								{% endfor %}
+							</ul>
+						{% endif %}
+					{% endwith %}
+				</div>
+				<!-- New Buttons: Sort, Restrict, Ban -->
+				<div class="btn-group">
+					
+					<a href="{{ url_for('admin_ban') }}">
+						<i class='bx bx-block'></i>
+						<span class="text">Ban</span>
+					</a>
+				</div>
+				
+				
+			</div>
+		
+			<ul class="box-info">
+
+			</ul>
+
+			<div class="table-data">
+				<div class="order">
+					<div class="head">
+						<h3>Seller Accounts Table</h3>
+						<i class='bx bx-search'></i>
+						<i class='bx bx-filter'></i>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Image</th>
+								<th>Name </th>
+								<th>Date Created</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for seller in sellers_approved %}
+							<tr>
+								<td><img src="{{ url_for('static', filename='uploads/profile_pics/' ~ seller[0]) }}" class="user-image" alt="Profile Picture"></td>
+								<td>{{ seller[1] }}, {{ seller[2] }}</td> <!-- Concatenating last name and first name -->
+								<td>{{ seller[3] }}</td>
+								<td>
+									<a href="{{ url_for('admin_ban') }}" class="btn-edit">
+										<i class='bx bx-block'></i> Ban
+									</a>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+						
+					</table>
+				</div>
+			</div>
+		
+			<div class="table-data">
+				<div class="order">
+					<div class="head">
+						<h3>Buyer Accounts Table</h3>
+						<i class='bx bx-search'></i>
+						<i class='bx bx-filter'></i>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Image</th>
+								<th>Name </th>
+								<th>Date Created</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for seller in buyers %}
+							<tr>
+								<!-- Corrected to use seller[0] for the profile picture -->
+								<td><img src="{{ url_for('static', filename='uploads/profile_pics/' ~ seller[0]) }}" class="user-image" alt="Profile Picture"></td>
+								<td>{{ seller[1] }}, {{ seller[2] }}</td> <!-- Concatenating last name and first name -->
+								<td>{{ seller[3] }}</td>
+								<td>
+									<a href="{{ url_for('admin_ban') }}" class="btn-edit">
+										<i class='bx bx-block'></i> Ban
+									</a>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			
+			<div class="table-data">
+				<div class="order">
+					<div class="head">
+						<h3>Pending Accounts Table</h3>
+						<i class='bx bx-search'></i>
+						<i class='bx bx-filter'></i>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Image</th>
+								<th>Name</th>
+								<th>Date Created</th>
+								<th>Account Status</th>
+								<th>Email</th>
+								<th>Actions</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for seller in accounts %}
+							<tr>
+								<td>{{ seller[5] }}</td> <!-- Seller ID -->
+								<td><img src="{{ url_for('static', filename='uploads/profile_pics/' ~ seller[0]) }}" class="user-image" alt="Profile Picture"></td>
+								<td>{{ seller[1] }}, {{ seller[2] }}</td> <!-- Last name, First name -->
+								<td>{{ seller[3] }}</td> <!-- Date Created -->
+								<td>{{ seller[4] }}</td> <!-- Account Status -->
+								<td>{{ seller[6] }}</td> <!-- Email -->
+								<td>
+									<button class="btn-show-info" onclick="showModal('{{ seller[5]}}')">Wiew ID</button>
+
+								</td>
+								<td>
+									<form action="{{ url_for('approve_account', user_id=seller[5]) }}" method="POST">
+										<button type="submit" class="btn-approve" onclick="return confirm('Are you sure you want to Approve this user?');">
+											<i class='bx bxs-approve-dots'></i> Approve
+										</button>
+									</form>
+								</td>
+								<td>
+									<button class="btn-reject" data-email="{{ seller[6] }}" data-user-id="{{ seller[5] }}" data-name="{{ seller[1] }}, {{ seller[2] }}" onclick="openRejectModal(this)">
+										<i class='bx bxs-block'></i> Reject
+									</button>
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			
+			<!-- Modal Structure -->
+			<div id="infoModal" class="modal">
+				<div class="modal-content">
+					<span class="close-btn" onclick="closeModal()">&times;</span>
+					<h3>Valid ID</h3>
+					<img id="valid-id-image" src="" alt="Valid ID Photo" class="modal-image">
+				</div>
+			</div>
+
+			<!-- Modal for Rejecting Account -->
+			<div id="rejectModal" class="modal">
+				<div class="modal-content">
+					<span class="close" onclick="closeRejectModal()">&times;</span>
+					<h3>Reject Account</h3>
+					<form action="{{ url_for('reject_account') }}" method="POST">
+						<input type="hidden" id="reject_user_id"  name="user_id">
+						<p>Name: <span id="reject_name"></span></p>
+						<p>Email: <span id="reject_email"></span></p>
+						<select class="form-control" id="message" name="message" rows="5" placeholder="Enter reason for rejection...">
+							<option value="">Select a reason</option>
+                    		<option value="Inappropriate Profile Picture"> Inappropriate Profile Picture</option>
+                    		<option value="Invalid ID">Invalid ID</option>
+                    		<option value="Other">Other</option>
+						</select><br><br>
+						<button type="submit" class="btn-reject-confirm"  onclick="return confirm('Are you sure you want to reject this user?');">Reject</button>
+					</form>
+				</div>
+			</div>
+
+			
+			<!-- Message Modal -->
+			<div id="messageModal" class="modal">
+				<div class="modal-content">
+					<span class="close">&times;</span>
+					<h2>Send a Message</h2>
+					<form action="{{ url_for('send_message') }}" method="post">
+						<label for="message">Message:</label>
+							<textarea id="message" name="message" rows="5" required></textarea>
+						<button type="submit" class="send-btn">Send</button>
+					</form>
+				</div>
+			</div>
+
+		<!-- Ban Modal -->
+		<div id="banModal" class="modal">
+			<div class="modal-content">
+				<span class="close">&times;</span>
+				<h2>Ban User</h2>
+				<form>
+					<label for="reason">Reason for Ban:</label>
+					<input type="text" id="reason" name="reason" placeholder="Enter the reason for banning">
+					<label for="duration">Ban Duration:</label>
+					<input type="text" id="duration" name="duration" placeholder="Specify duration">
+					
+					<!-- Table inside modal (optional) -->
+					<table>
+						<tr>
+							<th>Info</th>
+							<th>Details</th>
+						</tr>
+						<tr>
+							<td>User ID</td>
+							<td>12345</td>
+						</tr>
+						<tr>
+							<td>Username</td>
+							<td>JohnDoe</td>
+						</tr>
+					</table>
+            
+            <button type="submit" class="send-btn">Submit Ban</button>
+        </form>
+    </div>
+</div>
+
+
+</main>
+		
+		<!-- MAIN -->
+</section>
+	<!-- CONTENT -->
+	
+	<script>
+		// Get the modal and button elements
+		const banModal = document.getElementById("banModal");
+		const banButton = document.querySelector(".btn-ban");
+		const closeButton = document.querySelector(".modal-content .close");
+
+		// Show modal when 'Ban' button is clicked
+		banButton.addEventListener("click", function(event) {
+			event.preventDefault();
+			banModal.style.display = "flex"; // Show the modal with flex to center content
+		});
+
+		// Hide modal when close button is clicked
+		closeButton.addEventListener("click", function() {
+			banModal.style.display = "none";
+		});
+
+		// Hide modal when clicking outside of the modal content
+		window.addEventListener("click", function(event) {
+			if (event.target === banModal) {
+				banModal.style.display = "none";
+			}
+		});
+
+
+		    // Open the reject modal and populate with account details
+		function openRejectModal(button) {
+			const email = button.getAttribute('data-email');
+			const name = button.getAttribute('data-name');
+			const userId = button.getAttribute('data-user-id');
+				
+				// Populate modal with data
+			document.getElementById('reject_email').textContent = email;
+			document.getElementById('reject_name').textContent = name;
+			document.getElementById('reject_user_id').value = userId;
+
+				// Display modal
+			document.getElementById('rejectModal').style.display = 'flex';
+			}
+
+			// Close the reject modal
+			function closeRejectModal() {
+				document.getElementById('rejectModal').style.display = 'none';
+			}
+
+			// Close modal if clicked outside
+			window.onclick = function(event) {
+				if (event.target == document.getElementById('rejectModal')) {
+					closeRejectModal();
+				}
+		}
+
+		function showModal(userId) {
+			// Fetch the valid ID image from the server based on the userId
+			fetch(`/get_valid_id_image/${userId}`)
+				.then(response => response.json())
+				.then(data => {
+					// Set the modal image source to the valid ID image URL
+					const modalImage = document.getElementById('valid-id-image');
+					modalImage.src = data.image_url;  // Assuming the server returns the image URL
+
+					// Show the modal
+					const modal = document.getElementById('infoModal');
+					modal.style.display = 'flex';
+				})
+				.catch(error => console.error('Error fetching valid ID image:', error));
+		}
+
+		function closeModal() {
+			// Hide the modal
+			const modal = document.getElementById('infoModal');
+			modal.style.display = 'none';
+		}
+
+		function toggleDropdown(event) {
+			event.preventDefault();
+			const dropdown = document.getElementById('notificationDropdown');
+			dropdown.classList.toggle('show');
+			loadNotifications(); // Load notifications when dropdown is opened
+		}
+
+		function markAsRead(notificationId) {
+			fetch(`/notifications/mark_as_read/${notificationId}`, {
+				method: 'POST',
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// Reload notifications or update the UI to reflect the new status
+					loadNotifications();  // This function can reload the notifications list
+				}
+			})
+			.catch(error => console.error('Error marking notification as read:', error));
+		}
+
+		function loadNotifications() {
+			fetch('/notifications')
+				.then(response => response.json())
+				.then(data => {
+					const notificationList = document.getElementById('notificationList');
+					notificationList.innerHTML = '';  // Clear the existing list
+
+					data.forEach(notification => {
+						const li = document.createElement('li');
+						const link = document.createElement('a');
+						link.href = `/admin_management`;  // Or wherever the notification links to
+						link.textContent = `${notification.message}`;
+
+						// Apply a class based on the read/unread status
+						if (notification.status === 'unread') {
+							li.classList.add('unread');
+						} else {
+							li.classList.add('read');
+						}
+
+						// When the notification is clicked, mark it as read
+						link.addEventListener('click', () => {
+							markAsRead(notification.id);  // Pass the notification ID to mark it as read
+						});
+
+						li.appendChild(link);
+						notificationList.appendChild(li);
+					});
+				})
+				.catch(error => console.error('Error loading notifications:', error));
+		}
+
+		// Attach to modal open event
+		document.getElementById('notificationDropdown').addEventListener('shown.bs.dropdown', markNotificationsAsRead);
+
+	</script>
+<script src="{{ url_for('static', filename='script3.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Profile</title>
+    <link rel="stylesheet" href="../static/buyer_prof.css">
+
+
+    <!-- Add Icon Library (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap"
+  rel="stylesheet">
+
+
+
+<body id="top">
+    <!-- Header Section -->
+        <!-- Header Section -->
+        <header class="header" data-header>
+            <div class="container">
+                <!-- Logo on the Left -->
+                <a href="#" class="logo">PETHUB</a>
+                
+                <!-- Logout and Edit Profile Buttons in Separate Containers -->
+                <div class="logout-container">
+                    <!-- Edit Profile Button -->
+                    <a href="{{ url_for('index') }}" class="edit-button">
+                        Home
+                    </a>
+                    <!-- Logout Button -->
+                    <form action="{{ url_for('logout') }}" method="POST" style="margin: 0;">
+                        <button type="submit" class="logout-button">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </header>
+
+    <!-- Profile Card Section -->
+    <main>
+        <div class="profile-card">
+            <h2>My Profile</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flashes">
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% endwith %}
+
+            <div class="divider">
+                <!-- User Image at the Bottom -->
+                <div class="profile-image-container">
+                    <!-- Display current profile picture -->
+                    <img src="{{ profile_picture_url }}" alt="User Profile Picture" class="action-btn user" aria-label="User">
+                    
+                    <!-- File Picker for New Profile Picture -->
+                </div>
+                <div>
+                    <form action="{{ url_for('upload_profile_picture') }}" method="POST" enctype="multipart/form-data">
+                        <label for="profile_picture" class="file-label">Change Profile Picture</label> <br>
+                        <input type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+                        <button type="submit" class="upload-btn">Upload</button>
+                    </form>
+                </div>
+            </div>
+            
+            
+            <!-- Editable fields -->
+            <form method="POST" action="{{ url_for('update_profile') }}">
+                <div>
+                    <h3 for="address">Personal Information</h3> <br>
+                    <div>
+                        <i class="fas fa-user"></i><label for="firstname">First Name:</label>
+                        <input type="text" id="firstname" name="firstname" value="{{ user.firstname }}" required>
+                        <i class="fas fa-user"></i><label for="middlename">Middle Name:</label>
+                        <input type="text" id="middlename" name="middlename" value="{{ user.middlename }}" required>
+                        <i class="fas fa-user"></i><label for="lastname">Last Name:</label>
+                        <input type="text" id="lastname" name="lastname" value="{{ user.lastname }}" required>
+
+                    </div>
+                    
+                    <div>
+                        <i class="fas fa-calendar-alt"></i> <label for="birthdate">Birthdate:</label>
+                        <input type="date" id="birthdate" name="birthdate" value="{{ user.birthdate }}" required>
+                    </div>
+    
+                    <div>
+                        <i class="fas fa-venus-mars"></i><strong for="sex">Sex:</strong>
+                        <select id="sex" name="sex" required>
+                            <option value="Male" {% if user.sex == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if user.sex == 'Female' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <i class="fas fa-envelope"></i><label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" value="{{ user.password }}" required>
+                    </div>
+                </div>
+                
+                <div class="centered">
+                    <button type="submit" class="save-button" onclick="return confirm('Save Changes?');">Save Changes</button>
+                </div>
+            </form>
+
+            <form method="POST" action="{{ url_for('update_address') }}">
+                
+                <div>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Current Address:</strong> 
+                        {{ user.housenumber }}, {{ user.street }}, {{ user.barangay }}, {{ user.city }}, {{ user.province }}, 
+                        {{ user.region }}
+                    </p>
+                    <strong>Edit Address:</strong> 
+                    <div class="form-group">
+                        <label for="region">Region</label>
+                        <select id="region" class="form-control">
+                            <option selected disabled>Choose Region</option>
+                        </select>
+                        <input type="hidden" id="region-text" name="region">
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="province">Province</label>
+                        <select id="province" class="form-control">
+                            <option selected disabled>Choose Province</option>
+                        </select>
+                        <input type="hidden" id="province-text" name="province">
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="city">City/Municipality</label>
+                        <select id="city" class="form-control">
+                            <option selected disabled>Choose City/Municipality</option>
+                        </select>
+                        <input type="hidden" id="city-text" name="city">
+                    </div>
+                
+                    <div class="form-group">
+                        <label for="barangay">Barangay</label>
+                        <select id="barangay" class="form-control">
+                            <option selected disabled>Choose Barangay</option>
+                        </select>
+                        <input type="hidden" id="barangay-text" name="barangay">
+                    </div>
+                    <label for="street">Street</label>
+                    <input type="text" id="street" name="street">
+
+                    <label for="housenumber">House Number</label>
+                    <input type="text" id="housenumber" name="housenumber">
+                </div>
+
+                <div class="centered">
+                    <button type="submit" class="save-button" onclick="return confirm('Save Changes?');">Update Address</button>
+                </div>
+            </form>
+
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiBase = 'https://psgc.cloud/api'; // Replace with your API URL
+
+            const regionDropdown = document.getElementById('region');
+            const provinceDropdown = document.getElementById('province');
+            const cityDropdown = document.getElementById('city');
+            const barangayDropdown = document.getElementById('barangay');
+
+            // Populate Regions
+            fetch(`${apiBase}/regions`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(region => {
+                        const option = document.createElement('option');
+                        option.value = region.code;
+                        option.textContent = region.name;
+                        regionDropdown.appendChild(option);
+                    });
+                });
+
+            // Handle Region Change
+            regionDropdown.addEventListener('change', function () {
+                const selectedRegion = regionDropdown.value;
+                document.getElementById('region-text').value = regionDropdown.options[regionDropdown.selectedIndex].text;
+
+                // Clear dependent dropdowns
+                provinceDropdown.innerHTML = '<option selected disabled>Choose Province</option>';
+                cityDropdown.innerHTML = '<option selected disabled>Choose City/Municipality</option>';
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch provinces for the selected region
+                fetch(`${apiBase}/regions/${selectedRegion}/provinces`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(province => {
+                            const option = document.createElement('option');
+                            option.value = province.code;
+                            option.textContent = province.name;
+                            provinceDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle Province Change
+            provinceDropdown.addEventListener('change', function () {
+                const selectedProvince = provinceDropdown.value;
+                document.getElementById('province-text').value = provinceDropdown.options[provinceDropdown.selectedIndex].text;
+
+                // Clear dependent dropdowns
+                cityDropdown.innerHTML = '<option selected disabled>Choose City/Municipality</option>';
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch cities/municipalities for the selected province
+                fetch(`${apiBase}/provinces/${selectedProvince}/cities-municipalities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.code;
+                            option.textContent = city.name;
+                            cityDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle City Change
+            cityDropdown.addEventListener('change', function () {
+                const selectedCity = cityDropdown.value;
+                document.getElementById('city-text').value = cityDropdown.options[cityDropdown.selectedIndex].text;
+
+                // Clear dependent dropdown
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch barangays for the selected city
+                fetch(`${apiBase}/cities-municipalities/${selectedCity}/barangays`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(barangay => {
+                            const option = document.createElement('option');
+                            option.value = barangay.code;
+                            option.textContent = barangay.name;
+                            barangayDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle Barangay Change
+            barangayDropdown.addEventListener('change', function () {
+                document.getElementById('barangay-text').value = barangayDropdown.options[barangayDropdown.selectedIndex].text;
+            });
+        });
+    </script>
+</body>
+</html>

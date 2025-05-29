@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.product_name }} - Product Details | PETHUB</title>
+    <link rel="shortcut icon" href="../static/assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/product_details.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+
+</head>
+<body id="top">
+    <header class="header" data-header>
+        <div class="container">
+            <button class="nav-toggle-btn" aria-label="toggle menu" data-nav-toggler>
+                <ion-icon name="menu-outline" aria-hidden="true" class="menu-icon"></ion-icon>
+                <ion-icon name="close-outline" aria-label="true" class="close-icon"></ion-icon>
+            </button>
+            <a href="#" class="logo">PETHUB</a>
+            <nav class="navbar" data-navbar>
+                <ul class="navbar-list">
+                    <li class="navbar-item"><a href="{{ url_for('index') }}" class="navbar-link" data-nav-link>Home</a></li>
+                    <li class="navbar-item"><a href="{{ url_for('index') }}" class="navbar-link" data-nav-link>Products</a></li>
+                    <li class="navbar-item"><a href="#" class="navbar-link" data-nav-link>My Orders</a></li>
+                </ul>
+                <a href="#" class="navbar-action-btn">Log In</a>
+            </nav>
+            <button class="action-btn" aria-label="cart" onclick="window.location.href='/cart'">
+                <ion-icon name="bag-handle-outline" aria-hidden="true"></ion-icon>
+            </button>
+      
+              <img  src="{{ profile_picture_url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" class="action-btn user" aria-label="User" onclick="toggleDropdown()"></img>
+      
+              <!-- Dropdown Box -->
+              <div class="dropdown-menu" id="userDropdown">
+                <a href="/profile" class="dropdown-item">My Profile</a>
+                
+                <!-- Logout Form -->
+                <form action="{{ url_for('logout') }}" method="POST">
+                  <button type="submit" class="dropdown-item" style="border: none; background: transparent; width: 100%; text-align: left;">
+                    Logout
+                  </button>
+                </form>
+              </div>
+            </div>
+        </div>
+    </header>
+    <button id="chatTab">
+        💬
+    </button>
+      
+      <!-- Chat Modal -->
+      <!-- Chat Modal -->
+      <div id="chatModal">
+        <div id="chatWindow">
+            <div id="chatHeader" data-receiver-id="">Select a seller to chat</div>
+            <div class="chat-container">
+                <div class="sidebar">
+                    <h3>Sellers</h3>
+                    <ul id="seller-list"></ul>
+                </div>
+                <div class="chat-window">
+                    <div id="chat-messages"></div>
+                    <form id="message-form">
+                        <input type="text" id="message-input" placeholder="Type a message..." required>
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+            </div>
+            <button id="closeChat">✖</button>
+        </div>
+      </div>
+
+      <script>
+        const chatTab = document.getElementById('chatTab');
+        const chatModal = document.getElementById('chatModal');
+        const closeChat = document.getElementById('closeChat');
+      
+       // Open the chat modal
+      chatTab.addEventListener('click', () => {
+          chatModal.style.display = 'flex';
+      });
+      
+      // Close the chat modal
+      closeChat.addEventListener('click', () => {
+          chatModal.style.display = 'none';
+      });
+      
+      let currentReceiverId = null;
+      
+      // Fetch sellers and populate the sidebar
+      fetch('/get_sellers')
+          .then(response => response.json())
+          .then(data => {
+              const sellerList = document.getElementById('seller-list');
+              sellerList.innerHTML = ''; // Clear existing list
+              if (data.error) {
+                  alert(data.error);
+                  return;
+              }
+              data.forEach(seller => {
+                  const li = document.createElement('li');
+                  li.textContent = `${seller.firstname} ${seller.lastname}`;
+                  li.dataset.id = seller.id;
+                  li.addEventListener('click', () => loadConversation(seller.id, seller.firstname, seller.lastname));
+                  sellerList.appendChild(li);
+              });
+          })
+          .catch(error => console.error('Error fetching sellers:', error));
+      
+      // Load chat conversation
+      function loadConversation(sellerId, firstname, lastname) {
+          currentReceiverId = sellerId;
+          const chatHeader = document.getElementById('chatHeader');
+          chatHeader.textContent = `Chat with ${firstname} ${lastname}`;
+          chatHeader.dataset.receiverId = sellerId;
+      
+          fetch(`/get_private_messages?receiver_id=${sellerId}`)
+              .then(response => response.json())
+              .then(messages => {
+                  const chatMessages = document.getElementById('chat-messages');
+                  chatMessages.innerHTML = ''; // Clear previous messages
+                  if (messages.error) {
+                      alert(messages.error);
+                      return;
+                  }
+                  messages.forEach(msg => {
+                      const div = document.createElement('div');
+                      div.className = msg.sender_id == currentReceiverId ? 'message received' : 'message sent';
+                      div.innerHTML = `<span>${msg.message}</span><small>${new Date(msg.timestamp).toLocaleTimeString()}</small>`;
+                      chatMessages.appendChild(div);
+                  });
+                  chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
+              })
+              .catch(error => console.error('Error fetching messages:', error));
+      }
+      
+      // Send a message
+      document.getElementById('message-form').addEventListener('submit', event => {
+          event.preventDefault();
+          const messageInput = document.getElementById('message-input');
+          const message = messageInput.value.trim();
+      
+          if (!currentReceiverId) {
+              alert("Please select a seller to chat with first.");
+              return;
+          }
+      
+          if (!message) {
+              alert("Message cannot be empty.");
+              return;
+          }
+      
+          fetch('/get_logged_in_user_id')
+              .then(response => response.json())
+              .then(data => {
+                  if (data.error) {
+                      alert(data.error);
+                      return;
+                  }
+      
+                  const senderId = data.user_id; // Logged-in user ID
+      
+                  fetch('/send_private_message', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                      body: `receiver_id=${currentReceiverId}&message=${encodeURIComponent(message)}`
+                  })
+                      .then(response => response.json())
+                      .then(res => {
+                          if (res.error) {
+                              alert(res.error);
+                              return;
+                          }
+                          messageInput.value = ''; // Clear input
+                          loadConversation(currentReceiverId); // Refresh conversation
+                      })
+                      .catch(error => console.error('Error sending message:', error));
+              })
+              .catch(error => console.error('Error getting logged-in user ID:', error));
+      });
+      
+      </script>      
+    <main>
+        <article>
+            <section class="product-detail-section">
+                <div class="container">
+                    <div class="product-detail-wrapper">
+                        <div class="product-image2">
+                            {% if product.product_picture %}
+                                <img id="product-image" src="{{ url_for('static', filename='uploads/profile_pics/' ~ product.product_picture) }}" alt="{{ product.product_name }}">
+                            {% else %}
+                                <p>No image available.</p>
+                            {% endif %}
+                        </div>                         
+                        <div class="product-info">
+                            <h1 class="product-name">{{ product.product_name }}</h1>
+                            <p class="product-price" id="product-price">₱ {{ product.price }}</p>
+                            <p class="product-details">{{ product.details }}</p>
+                            <p class="product-quantity" id="product-quantity"><strong>Stock:</strong> {{ product.quantity }}</p>
+                            <p class="product-category"><strong>Category:</strong> {{ product.category }}</p>
+                            <p class="shop-name"><strong>Seller :</strong> {{ product.shop_name }}</p>
+                        
+                            
+                            <h3>Variations:</h3>
+                            <div class="product-variations">
+                                {% for variation in variations %}
+                                    <div class="variation-group">
+                                        <div class="variation-names">
+                                            <label class="variation-name">
+                                                <!-- Hidden input field for variation ID -->
+                                                <input type="hidden" name="variation_id_{{ loop.index }}" value="{{ variation.id }}" id="hidden-variation-{{ loop.index }}">
+
+                                                <!-- Radio button for selecting variation -->
+                                                <input type="radio" name="selected-variation" 
+                                                    value="{{ variation.attributes[0].attribute_name }}" 
+                                                    onchange="enableAttributeButtons('{{ loop.index }}', '{{ variation.id }}')">
+                                                {{ variation.attributes[0].attribute_name }}
+                                            </label>
+                                        </div>
+                                        <div class="variation-buttons" id="buttons-{{ loop.index }}" style="display: none;">
+                                            {% for attribute in variation.attributes %}
+                                                <label class="variation-button" style="display: inline-block;">
+                                                    <input type="radio" name="selected-attribute" 
+                                                        value="{{ attribute.attribute_value }}" 
+                                                        data-price="{{ attribute.attribute_price }}" 
+                                                        data-stock="{{ attribute.attribute_stock }}" 
+                                                        onclick="selectVariation('{{ attribute.attribute_name }}', '{{ attribute.attribute_value }}', '{{ attribute.attribute_price }}', '{{ attribute.attribute_stock }}', '{{ image_url }}', '{{ variation.id }}')">
+                                                    {{ attribute.attribute_value }}
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            
+                            <div class="quantity-input">
+                                <button type="button" class="btn-icon"  id="decrease-btn" onclick="updateQuantity('decrease')">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" id="quantity" name="quantity" 
+                                       value="{{ session.get('current_quantity', 1) }}" 
+                                       min="1" max="{{ product.quantity }}" required oninput="handleQuantityChange()">
+                                <button type="button" class="btn-icon" id="increase-btn"  onclick="updateQuantity('increase')">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+
+                            <div class="product-buttons">
+                                <button class="btn btn-add-to-cart" onclick="addToCart('{{ product.id }}')" {% if product.quantity == 0 %}disabled {% endif %}>Add to Cart</button>
+                                <button class="btn btn-buy-now" onclick="buynow('{{ product.id }}')" {% if product.quantity == 0 %}disabled {% endif %}>Buy Now</button>
+                            </div>
+                        </div>
+                    </div>                                                     
+                </div>
+            </section>
+            <section class="shop-info-section">
+                <div class="shop-card">
+                    <div class="shop-image">
+                        {% if seller_profile_picture %}
+                            <img src="{{ url_for('static', filename='uploads/profile_pics/' + seller_profile_picture) }}" alt="Shop Image">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='uploads/profile_pics/default.png') }}" alt="Default Shop Image">
+                        {% endif %}
+                    </div>
+                    <div class="shop-details">
+                        <h3 class="shop-name">{{ product.shop_name }}</h3>
+                        <h4 class="seller-name">Seller: {{ seller_full_name }}</h4>
+                        <span class="shop-status {% if seller_status == 'Online' %} active-status {% elif seller_status == 'Offline' %} offline-status {% endif %}">
+                            {{ seller_status }}
+                        </span>
+                          
+                        <div class="shop-actions">
+                            <button class="chat-now-btn" id="chatnow">Chat Now</button>
+                            <a href="{{ url_for('view_shop', seller_id=product.seller_id) }}" class="view-shop-btn">View Shop</a>
+                        </div>
+                    </div>
+                </div>
+            </section>            
+            <!-- Feedback Section -->
+            <section class="feedback-section py-5">
+                <div class="container">
+                    <h2 class="mb-4">Customer Feedback</h2>
+            
+                    <!-- Display existing feedbacks -->
+                    <div id="feedback-list">
+                        {% if feedbacks %}
+                            {% for feedback in feedbacks %}
+                            <div class="feedback-item mb-4 p-3 border rounded shadow-sm">
+                                <div class="feedback-header d-flex justify-content-between align-items-center">
+                                    <strong class="user-name">{{ feedback.user_name }}</strong>
+                                    <span class="rating text-warning">
+                                        {% for i in range(1, 6) %}
+                                            <i class="fas fa-star {% if i <= feedback.rating %}filled{% else %}far{% endif %}"></i>
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                                <p class="mt-2">{{ feedback.comment }}</p>
+                    
+                                {% if feedback.photo %}
+                                <div class="mt-3">
+                                    <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ feedback.photo) }}" 
+                                         alt="Feedback Image" 
+                                         class="img-fluid feedback-image rounded" 
+                                         style="max-width: 200px;">
+                                </div>
+                                {% endif %}
+                    
+                                <p class="mt-3 text-muted">
+                                    Posted on: {{ feedback.timestamp.strftime('%B %d, %Y at %I:%M %p') }}
+                                </p>
+                                <hr>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted">No feedback available yet. Be the first to review!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>                        
+        </article>
+    </main>
+    <script src="../static/script.js" defer></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

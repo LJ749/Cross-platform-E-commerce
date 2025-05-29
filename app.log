@@ -1,0 +1,31 @@
+2024-09-28 20:20:11,448 - WARNING -  * Debugger is active!
+2024-09-28 20:20:11,454 - INFO -  * Debugger PIN: 683-016-927
+2024-09-28 20:20:18,514 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-09-28 20:20:18,515 - INFO - [33mPress CTRL+C to quit[0m
+2024-09-28 20:20:18,517 - INFO -  * Restarting with stat
+2024-09-28 20:20:18,837 - WARNING -  * Debugger is active!
+2024-09-28 20:20:18,842 - INFO -  * Debugger PIN: 683-016-927
+2024-09-28 20:20:20,213 - INFO - 127.0.0.1 - - [28/Sep/2024 20:20:20] "GET / HTTP/1.1" 200 -
+2024-09-28 20:20:20,255 - INFO - 127.0.0.1 - - [28/Sep/2024 20:20:20] "[36mGET /static/styles.css HTTP/1.1[0m" 304 -
+2024-09-28 20:20:30,929 - INFO - Database connection successful.
+2024-09-28 20:20:30,930 - ERROR - Database error occurred: Unread result found
+2024-09-28 20:20:30,930 - INFO - 127.0.0.1 - - [28/Sep/2024 20:20:30] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-09-28 20:20:30,934 - INFO - 127.0.0.1 - - [28/Sep/2024 20:20:30] "GET / HTTP/1.1" 200 -
+2024-09-28 20:20:30,945 - INFO - 127.0.0.1 - - [28/Sep/2024 20:20:30] "[36mGET /static/styles.css HTTP/1.1[0m" 304 -
+2024-09-28 20:22:15,874 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-09-28 20:22:15,874 - INFO - [33mPress CTRL+C to quit[0m
+2024-09-28 20:22:15,875 - INFO -  * Restarting with stat
+2024-09-28 20:22:16,198 - WARNING -  * Debugger is active!
+2024-09-28 20:22:16,204 - INFO -  * Debugger PIN: 683-016-927
+2024-09-28 20:22:19,720 - INFO - 127.0.0.1 - - [28/Sep/2024 20:22:19] "GET / HTTP/1.1" 200 -
+2024-09-28 20:22:19,764 - INFO - 127.0.0.1 - - [28/Sep/2024 20:22:19] "[36mGET /static/styles.css HTTP/1.1[0m" 304 -
+2024-09-28 20:22:28,646 - INFO - Database connection successful.
+2024-09-28 20:22:28,647 - ERROR - Database error occurred: Unread result found
+2024-09-28 20:22:28,648 - INFO - 127.0.0.1 - - [28/Sep/2024 20:22:28] "[32mPOST /login HTTP/1.1[0m" 302 -
+2024-09-28 20:22:28,652 - INFO - 127.0.0.1 - - [28/Sep/2024 20:22:28] "GET / HTTP/1.1" 200 -
+2024-09-28 20:22:28,661 - INFO - 127.0.0.1 - - [28/Sep/2024 20:22:28] "[36mGET /static/styles.css HTTP/1.1[0m" 304 -
+2024-09-28 20:23:41,448 - INFO -  * Detected change in 'c:\\Users\\Administrator\\Documents\\ITST WEB\\app.py', reloading
+2024-09-28 20:23:41,477 - INFO -  * Restarting with stat
+2024-09-28 20:25:07,048 - INFO -  * Restarting with stat

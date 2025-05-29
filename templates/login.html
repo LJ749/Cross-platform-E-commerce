@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="../static/script.js" defer></script> <!-- Ensure this path is correct -->
+</head>
+<body>
+    {% if banned %}
+    <div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="banModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="banModalLabel">Account Banned</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ ban_reason }}</p>
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" action="{{ url_for('logout') }}">
+                        <button type="submit" class="btn btn-danger">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show the ban modal on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            var banModal = new bootstrap.Modal(document.getElementById('banModal'));
+            banModal.show();
+        });
+    </script>
+    {% endif %}
+
+    <div class="form-card">
+        <h2>Login</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <label for="email">Email</label><br>
+            <input type="email" id="email" name="email" placeholder="Enter Your Email" required><br>
+
+            <label for="password">Password</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter Your Password" required><br>
+
+            <label class="show-password">
+                <input class="show-password" type="checkbox" id="show-password"> Show Password
+            </label><br>
+
+            <input type="submit" value="Login">
+            <a class="forgot-password" href="{{ url_for('register') }}">Forgot Password?</a>
+        </form>
+
+        <!-- Add a link to the registration page -->
+        <p class="forgot-password">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+    </div>
+</body>
+
+</html>
+

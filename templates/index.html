@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 
+    - primary meta tag
+  --> <title>PETHUB</title>
+  <meta name="title" content="PETHUB">
+  <meta name="description" content="">
+
+  <!-- 
+    - favicon
+  -->
+  <link rel="shortcut icon" href="../static/assets/images/favicon.svg" type="image/svg+xml">
+
+  <!-- 
+    - custom css link
+  -->
+  <link rel="stylesheet" href="../static/style.css">
+
+  <!-- 
+    - google font link
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap"
+    rel="stylesheet">
+
+  <!-- 
+    - preload images
+  -->
+  <link rel="preload" as="image" href="../static/assets/images/hero-/banner.jpg">
+
+</head>
+
+<body id="top">
+
+  <!-- 
+    - #HEADER
+  -->
+
+  <header class="header" data-header>
+    <div class="container">
+
+      <button class="nav-toggle-btn" aria-label="toggle manu" data-nav-toggler>
+        <ion-icon name="menu-outline" aria-hidden="true" class="menu-icon"></ion-icon>
+        <ion-icon name="close-outline" aria-label="true" class="close-icon"></ion-icon>
+      </button>
+
+      <a href="#" class="logo">PETHUB</a>
+
+      <nav class="navbar" data-navbar>
+        <ul class="navbar-list">
+
+          <li class="navbar-item">
+            <a href="#home" class="navbar-link" data-nav-link>Home</a>
+          </li>
+
+          <li class="navbar-item">
+            <a href="#shop" class="navbar-link" data-nav-link>Products</a>
+          </li>
+
+          <li class="navbar-item">
+            <a href="{{ url_for('my_orders') }}" class="navbar-link" data-nav-link>My Orders</a>
+          </li>
+        </ul>
+
+        <a href="#" class="navbar-action-btn">Log In</a>
+      </nav>
+
+      <div class="header-actions">
+
+        <div class="search-container">
+          <button class="action-btn" aria-label="Search" id="search-btn">
+            <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+          </button>
+          
+          <!-- Search Bar Form -->
+          <form id="search-form" method="GET" action="{{ url_for('search_products') }}">
+            <input type="text" id="search-bar" name="query" class="search-bar" placeholder="Search for products..." aria-label="Search">
+          </form>
+        </div>
+
+        <button class="action-btn" aria-label="cart" onclick="window.location.href='/cart'">
+          <ion-icon name="bag-handle-outline" aria-hidden="true"></ion-icon>
+        </button>
+
+
+        <img  src="{{ profile_picture_url }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" class="action-btn user" aria-label="User" onclick="toggleDropdown()"></img>
+
+        <!-- Dropdown Box -->
+        <div class="dropdown-menu" id="userDropdown">
+          <a href="/profile" class="dropdown-item">My Profile</a>
+          
+          <!-- Logout Form -->
+          <form action="{{ url_for('logout') }}" method="POST">
+            <button type="submit" class="dropdown-item" style="border: none; background: transparent; width: 100%; text-align: left;">
+              Logout
+            </button>
+          </form>
+        </div>
+  
+      </div>
+
+    </div>
+  </header>
+  <!-- Floating Chat Icon -->
+<button id="chatTab">
+  💬
+</button>
+
+<!-- Chat Modal -->
+<!-- Chat Modal -->
+<div id="chatModal">
+  <div id="chatWindow">
+      <div id="chatHeader" data-receiver-id="">Select a seller to chat</div>
+      <div class="chat-container">
+          <div class="sidebar">
+              <h3>Sellers</h3>
+              <ul id="seller-list"></ul>
+          </div>
+          <div class="chat-window">
+              <div id="chat-messages"></div>
+              <form id="message-form">
+                  <input type="text" id="message-input" placeholder="Type a message..." required>
+                  <button type="submit">Send</button>
+              </form>
+          </div>
+      </div>
+      <button id="closeChat">✖</button>
+  </div>
+</div>
+
+<script>
+  const chatTab = document.getElementById('chatTab');
+  const chatModal = document.getElementById('chatModal');
+  const closeChat = document.getElementById('closeChat');
+
+ // Open the chat modal
+chatTab.addEventListener('click', () => {
+    chatModal.style.display = 'flex';
+});
+
+// Close the chat modal
+closeChat.addEventListener('click', () => {
+    chatModal.style.display = 'none';
+});
+
+let currentReceiverId = null;
+
+// Fetch sellers and populate the sidebar
+fetch('/get_sellers')
+    .then(response => response.json())
+    .then(data => {
+        const sellerList = document.getElementById('seller-list');
+        sellerList.innerHTML = ''; // Clear existing list
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+        data.forEach(seller => {
+            const li = document.createElement('li');
+            li.textContent = `${seller.firstname} ${seller.lastname}`;
+            li.dataset.id = seller.id;
+            li.addEventListener('click', () => loadConversation(seller.id, seller.firstname, seller.lastname));
+            sellerList.appendChild(li);
+        });
+    })
+    .catch(error => console.error('Error fetching sellers:', error));
+
+// Load chat conversation
+function loadConversation(sellerId, firstname, lastname) {
+    currentReceiverId = sellerId;
+    const chatHeader = document.getElementById('chatHeader');
+    chatHeader.textContent = `Chat with ${firstname} ${lastname}`;
+    chatHeader.dataset.receiverId = sellerId;
+
+    fetch(`/get_private_messages?receiver_id=${sellerId}`)
+        .then(response => response.json())
+        .then(messages => {
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.innerHTML = ''; // Clear previous messages
+            if (messages.error) {
+                alert(messages.error);
+                return;
+            }
+            messages.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = msg.sender_id == currentReceiverId ? 'message received' : 'message sent';
+                div.innerHTML = `<span>${msg.message}</span><small>${new Date(msg.timestamp).toLocaleTimeString()}</small>`;
+                chatMessages.appendChild(div);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to the latest message
+        })
+        .catch(error => console.error('Error fetching messages:', error));
+}
+
+// Send a message
+document.getElementById('message-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const messageInput = document.getElementById('message-input');
+    const message = messageInput.value.trim();
+
+    if (!currentReceiverId) {
+        alert("Please select a seller to chat with first.");
+        return;
+    }
+
+    if (!message) {
+        alert("Message cannot be empty.");
+        return;
+    }
+
+    fetch('/get_logged_in_user_id')
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            const senderId = data.user_id; // Logged-in user ID
+
+            fetch('/send_private_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `receiver_id=${currentReceiverId}&message=${encodeURIComponent(message)}`
+            })
+                .then(response => response.json())
+                .then(res => {
+                    if (res.error) {
+                        alert(res.error);
+                        return;
+                    }
+                    messageInput.value = ''; // Clear input
+                    loadConversation(currentReceiverId); // Refresh conversation
+                })
+                .catch(error => console.error('Error sending message:', error));
+        })
+        .catch(error => console.error('Error getting logged-in user ID:', error));
+});
+
+</script>
+
+
+
+
+
+  <main>
+    <article>
+
+      <!-- 
+        - #HERO
+      -->
+
+      <section class="section hero has-bg-image" id="home" aria-label="home"
+        style="background-image: url('../static/assets/images/hero-banner.jpg')">
+        <div class="container">
+
+          <h1 class="h1 hero-title">
+            <span class="span">High Quality</span> Pet Food
+          </h1>
+
+          <p class="hero-text"></p>
+
+          <a href="#" class="btn">Shop Now</a>
+
+        </div>
+      </section>
+
+      <!-- 
+        - #CATEGORY
+      -->
+      <section class="section category" aria-label="category">
+        <div class="container">
+          <h2 class="h2 section-title">
+            <span class="span"></span> Categories
+          </h2>
+      
+          <ul class="has-scrollbar">
+            
+            <!-- Category: Food -->
+            <li class="scrollbar-item">
+              <a href="{{ url_for('category', category_name='Food') }}" class="category-card-link">
+                <div class="category-card">
+                  <figure class="card-banner img-holder" style="--width: 330; --height: 300;">
+                    <img src="{{ url_for('static', filename='assets/images/category-1.jpg') }}" width="330" height="300" loading="lazy" alt="Food" class="img-cover">
+                  </figure>
+                  <h3 class="h3 card-title">Food</h3>
+                </div>
+              </a>
+            </li>
+      
+            <!-- Category: Accessories -->
+            <li class="scrollbar-item">
+              <a href="{{ url_for('category', category_name='Accessories') }}" class="category-card-link">
+                <div class="category-card">
+                  <figure class="card-banner img-holder" style="--width: 330; --height: 300;">
+                    <img src="{{ url_for('static', filename='assets/images/category-2.jpg') }}" width="330" height="300" loading="lazy" alt="Accessories" class="img-cover">
+                  </figure>
+                  <h3 class="h3 card-title">Accessories</h3>
+                </div>
+              </a>
+            </li>
+      
+            <!-- Category: Medicines -->
+            <li class="scrollbar-item">
+              <a href="{{ url_for('category', category_name='Medicines') }}" class="category-card-link">
+                <div class="category-card">
+                  <figure class="card-banner img-holder" style="--width: 330; --height: 300;">
+                    <img src="{{ url_for('static', filename='assets/images/category-3.jpg') }}" width="330" height="300" loading="lazy" alt="Medicines" class="img-cover">
+                  </figure>
+                  <h3 class="h3 card-title">Medicines</h3>
+                </div>
+              </a>
+            </li>
+      
+            <!-- Category: Utilities -->
+            <li class="scrollbar-item">
+              <a href="{{ url_for('category', category_name='Utilities') }}" class="category-card-link">
+                <div class="category-card">
+                  <figure class="card-banner img-holder" style="--width: 330; --height: 300;">
+                    <img src="{{ url_for('static', filename='assets/images/category-4.jpg') }}" width="330" height="300" loading="lazy" alt="Utilities" class="img-cover">
+                  </figure>
+                  <h3 class="h3 card-title">Utilities</h3>
+                </div>
+              </a>
+            </li>
+      
+            <!-- Category: Grooming -->
+            <li class="scrollbar-item">
+              <a href="{{ url_for('category', category_name='Grooming') }}" class="category-card-link">
+                <div class="category-card">
+                  <figure class="card-banner img-holder" style="--width: 330; --height: 300;">
+                    <img src="{{ url_for('static', filename='assets/images/category-5.jpg') }}" width="330" height="300" loading="lazy" alt="Grooming" class="img-cover">
+                  </figure>
+                  <h3 class="h3 card-title">Grooming</h3>
+                </div>
+              </a>
+            </li>
+      
+          </ul>
+        </div>
+      </section>
+      
+      <!-- 
+        - #PRODUCT
+      -->
+      <section class="section product" id="shop" aria-label="product">
+        <div class="container">
+            <h2 class="h2 section-title">
+                <span class="span"></span> Shop
+            </h2>
+            <ul class="grid-list">
+                {% for product in products %}
+                <li class="product-item">
+                    <div class="product-image">
+                        {% if product.product_picture %}
+                            <a href="{{ url_for('product_details', product_id=product.id) }}">
+                                <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ product.product_picture) }}" alt="{{ product.product_name }}">
+                            </a>
+                        {% else %}
+                            <p>No image available.</p>
+                        {% endif %}
+                    </div>
+                    <h3 class="product-name">
+                        <a href="{{ url_for('product_details', product_id=product.id) }}">{{ product.product_name }}</a> 
+                    </h3>
+                    {% if product.quantity > 0 %}
+                        <p class="product-stock">Stock: {{ product.quantity }}</p>
+                    {% else %}
+                        <p class="product-stock out-of-stock">Out of Stock</p>
+                    {% endif %}
+                    <p class="product-price">Php {{ product.price }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+    
+    
+      <!-- 
+        - #CTA
+      -->
+
+      <section class="cta has-bg-image" aria-label="cta" style="background-image: url('../static/assets/images/cta-bg.jpg')">
+        <div class="container">
+
+          <figure class="cta-banner">
+            <img src="../static/assets/images/cta-banner.png" width="900" height="660" loading="lazy" alt="cat" class="w-100">
+          </figure>
+
+          <div class="cta-content">
+
+            <img src="../static/assets/images/cta-icon.png" width="120" height="35" loading="lazy" alt="taste guarantee"
+              class="img">
+
+            <h2 class="h2 section-title">Taste it, love it or we’ll replace it… Guaranteed!</h2>
+
+            <p class="section-text">
+              At Petio, we believe your dog and cat will love their food so much that if they don’t … we’ll help you
+              find a
+              replacement. That’s our taste guarantee.
+            </p>
+
+            <a href="#" class="btn">Find out more</a>
+
+          </div>
+
+        </div>
+      </section>
+
+
+
+
+
+      <!-- 
+        - #BRAND
+      -->
+
+      <section class="section brand" aria-label="brand">
+        <div class="container">
+
+          <h2 class="h2 section-title">
+            <span class="span">Popular</span> Brands
+          </h2>
+
+          <ul class="has-scrollbar">
+
+            <li class="scrollbar-item">
+              <div class="brand-card img-holder" style="--width: 150; --height: 150;">
+                <img src="../static/assets/images/brand-1.jpg" width="150" height="150" loading="lazy" alt="brand logo"
+                  class="img-cover">
+              </div>
+            </li>
+
+            <li class="scrollbar-item">
+              <div class="brand-card img-holder" style="--width: 150; --height: 150;">
+                <img src="../static/assets/images/brand-2.jpg" width="150" height="150" loading="lazy" alt="brand logo"
+                  class="img-cover">
+              </div>
+            </li>
+
+            <li class="scrollbar-item">
+              <div class="brand-card img-holder" style="--width: 150; --height: 150;">
+                <img src="../static/assets/images/brand-3.jpg" width="150" height="150" loading="lazy" alt="brand logo"
+                  class="img-cover">
+              </div>
+            </li>
+
+            <li class="scrollbar-item">
+              <div class="brand-card img-holder" style="--width: 150; --height: 150;">
+                <img src="../static/assets/images/brand-4.jpg" width="150" height="150" loading="lazy" alt="brand logo"
+                  class="img-cover">
+              </div>
+            </li>
+
+            <li class="scrollbar-item">
+              <div class="brand-card img-holder" style="--width: 150; --height: 150;">
+                <img src="../static/assets/images/brand-5.jpg" width="150" height="150" loading="lazy" alt="brand logo"
+                  class="img-cover">
+              </div>
+            </li>
+
+          </ul>
+
+        </div>
+      </section>
+
+    </article>
+  </main>
+  <!-- 
+    - #FOOTER
+  -->
+  <footer class="footer" style="background-image: url('../static/assets/images/footer-bg.jpg')">
+
+    <div class="footer-top section">
+      <div class="container">
+
+        <div class="footer-brand">
+
+          <a href="#" class="logo">PetHub</a>
+          <p class="footer-text">
+            If you have any question, please contact us at  <a href="PetHub@gmail.com"
+              class="link">PetHub@gmail.com</a>
+          </p>
+
+          <ul class="contact-list">
+
+            <li class="contact-item">
+              <ion-icon name="location-outline" aria-hidden="true"></ion-icon>
+
+              <address class="address">
+                Sta Cruz Laguna
+              </address>
+            </li>
+
+            <li class="contact-item">
+              <ion-icon name="call-outline" aria-hidden="true"></ion-icon>
+
+              <a href="tel:09812353561" class="contact-link">09812353561</a>
+            </li>
+
+          </ul>
+
+          <ul class="social-list">
+
+            <li>
+              <a href="#" class="social-link">
+                <ion-icon name="logo-facebook"></ion-icon>
+              </a>
+            </li>
+
+            <li>
+              <a href="#" class="social-link">
+                <ion-icon name="logo-twitter"></ion-icon>
+              </a>
+            </li>
+
+            <li>
+              <a href="#" class="social-link">
+                <ion-icon name="logo-pinterest"></ion-icon>
+              </a>
+            </li>
+
+            <li>
+              <a href="#" class="social-link">
+                <ion-icon name="logo-instagram"></ion-icon>
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+
+        <ul class="footer-list">
+          <li>
+            <a href="#" class="footer-link">About Us</a>
+          </li>
+
+          <li>
+            <a href="#" class="footer-link">Contact Us</a>
+          </li>
+        </ul>
+
+        <ul class="footer-list">
+
+          <li>
+            <p class="footer-list-title">Information</p>
+          </li>
+
+          <li>
+            <a href="#" class="footer-link">Online Store</a>
+          </li>
+
+          <li>
+            <a href="#" class="footer-link">Track Order</a>
+          </li>
+
+        </ul>
+
+        <ul class="footer-list">
+          <li>
+            <a href="#" class="footer-link">Grooming</a>
+          </li>
+        </ul>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+
+        
+
+      </div>
+    </div>
+
+  </footer>
+
+
+
+
+
+  <!-- 
+    - #BACK TO TOP
+  -->
+
+  <a href="#top" class="back-top-btn" aria-label="back to top" data-back-top-btn>
+    <ion-icon name="chevron-up" aria-hidden="true"></ion-icon>
+  </a>
+
+
+
+
+
+  <!-- 
+    - custom js link
+  -->
+  <script src="../static/assets/js/script.js" defer></script>
+
+  <!-- 
+    - ionicon link
+  -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+
+</html>

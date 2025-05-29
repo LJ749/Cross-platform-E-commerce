@@ -1,0 +1,183 @@
+.product-list {
+    display: flex;
+    flex-wrap: wrap;  /* Allow the items to wrap to the next row */
+    flex-direction: row;
+    gap: 20px;  /* Optional: space between the cards */
+    padding: 10px;
+    
+}
+
+.product-card {
+    display: flex;
+    flex-direction: row;  /* Set layout to row to display content horizontally */
+    justify-content: center;
+    align-items: center;
+    width: 350px; /* Set width */
+    height: 300px; /* Match height to width for a square card */
+    max-width: 1000px; /* Optional: Set a max width for responsiveness */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    margin: 10px 0;
+    font-size: large;
+}
+
+
+.product-image {
+    width: 150px;  /* Fixed width for image */
+    height: 150px; /* Fixed height for image */
+    flex-shrink: 0; /* Prevent image from shrinking */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Ensures the image covers the whole container */
+}
+
+.product-details {
+    flex-grow: 1;  /* Allow details to take the remaining space */
+    padding: 10px;
+    font-size: 14px;
+}
+
+.product-details h5 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.product-details p {
+    margin: 5px 0;
+}
+
+.product-card button {
+    margin-top: 10px;
+    font-size: large;
+}
+
+/* Optional: Adjust the modal image size to fit within the modal */
+.modal-body img {
+    width: 100%;
+    height: auto;
+}
+
+.buyer-modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    max-width: 900px;
+    color: var(--bs-modal-color);
+    pointer-events: auto;
+    background-color: var(--bs-modal-bg);
+    background-clip: padding-box;
+    outline: 0;
+}
+
+.order-details {
+    font-size: large;
+}
+
+.order-items {
+    display: flex;
+    flex-wrap: wrap; /* Optional: allows items to wrap if needed */
+    gap: 20px;
+}
+
+.order-container {
+    display: flex;
+    flex-wrap: wrap; /* Optional: allows items to wrap if needed */
+    gap: 20px; /* Adjust spacing between items */
+    margin-left: 80px;
+    margin-right: 80px;
+}
+
+.status-divider {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+  }
+  
+  .status-divider h3 {
+    font-size: 1.5rem;
+    color: #333;
+  }
+
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: center;
+    color: #333;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: #ff5722;
+}
+
+.tab.active {
+    color: #ff5722;
+    border-bottom: 2px solid #ff5722;
+}
+
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.order-table thead {
+    background-color: #f9f9f9;
+}
+
+.order-table th, .order-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.order-table th {
+    font-weight: bold;
+    background-color: #f1f1f1;
+}
+
+.order-table img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.order-table .btn {
+    padding: 5px 10px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.order-table .btn:hover {
+    background-color: #0056b3;
+}
+
+.status {
+    font-weight: bold;
+}
+  

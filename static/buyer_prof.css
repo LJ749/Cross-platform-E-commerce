@@ -1,0 +1,181 @@
+/* General Body Styling */
+body {
+  font-family: 'Nunito Sans', sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+/* Profile Card Styling */
+.profile-card {
+  max-width: 900px; /* Increased width for a wider profile card */
+  margin: 30px auto; /* Reduced top and bottom margin */
+  background: #fff;
+  padding: 30px; /* Increased padding for more space inside the card */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 90%; /* Make the card occupy 90% of the available width */
+}
+
+/* Title Styling */
+.profile-card h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* Profile Text Styling */
+.profile-card p {
+  font-size: 18px; /* Increased font size */
+  line-height: 1.6;
+  margin-bottom: 15px; /* Spacing between each item */
+}
+
+.profile-card i {
+  margin-right: 10px;
+  color: #5c5c5c; /* Icon color */
+}
+
+/* Profile Image Styling */
+.profile-image-container {
+  display: flex; /* Use Flexbox for centering */
+  justify-content: center; /* Horizontally center the content */
+  align-items: center; /* Vertically center the content (if needed in flex context) */
+  margin-bottom: 20px; /* Space between the image and the title */
+}
+
+.action-btn.user {
+  display: block;
+  width: 120px; /* Adjusted image size for prominence */
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #000000; /* Border around the profile picture */
+}
+
+/* Header Styling */
+.header {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #fff;
+  padding: 15px 0; /* Reduced padding to make the navbar smaller */
+  z-index: 4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Container */
+.header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px; /* Added horizontal padding */
+}
+
+/* Logo Styling */
+.logo {
+  font-family: 'Carter One', cursive;
+  font-size: 2.5rem; /* Slightly smaller logo size */
+  margin-left: 0;
+  color: navy;
+  text-decoration: none; /* Removed underline from logo */
+}
+
+/* Logout Container Styling */
+.logout-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Edit Profile Button Styling */
+.edit-button {
+  background-color: #4caf50;
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 10px 15px;
+  text-decoration: none;
+  margin-right: 15px; /* Space between Edit Profile and Logout buttons */
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.edit-button i {
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.edit-button:hover {
+  background-color: #45a049; /* Slightly darker green on hover */
+  transform: scale(1.05); /* Slightly grow the button */
+}
+
+/* Logout Button Styling */
+.logout-button {
+  background-color: #fa3a3a;
+  color: #ffffff;
+  border: 1px solid #f30d0d;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.logout-button i {
+  margin-right: 8px; /* Space between icon and text */
+}
+
+.logout-button:hover {
+  background-color: #ff6f61; /* Red color on hover */
+  color: white;
+  transform: scale(1.05); /* Slightly grow the button */
+}
+
+input[type="text"], input[type="email"], input[type="date"], input[type="password"], select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+input[type="text"]:focus, input[type="email"]:focus, input[type="date"]:focus, input[type="password"]:focus, select:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #fff;
+}
+
+.divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-label{
+  display: flex;
+  justify-content: center;
+}
+
+.save-button{
+  background-color: #4caf50;
+  color: white;
+  border-radius: 5px;
+  font-size: 16px;
+  padding: 10px 15px;
+  text-decoration: none;
+  margin-right: 15px;
+  display: flex
+}
+
+.centered{
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}

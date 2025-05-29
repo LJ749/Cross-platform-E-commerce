@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="../static/checkout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <h1>Checkout</h1>
+
+        <form action="/finalize_checkout" method="POST">
+            <!-- Product List (as before) -->
+            {% if selected_items %}
+                {% for item in selected_items %}
+                    <div class="checkout-item">
+                        <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ item.image) }}" alt="{{ item.name }}">
+                        <div class="item-details">
+                            <p class="item-name">{{ item.name }}</p>
+                            <p class="variation-details">
+                                <strong>Variation:</strong> {{ item.variation_name }}: {{ item.variation_value }}
+                            </p>
+                        </div>
+                        <div class="price">₱{{ item.price }}</div>
+                        <div class="quantity">x{{ item.quantity }}</div>
+                        <div class="item-total">₱{{ item.total }}</div>
+        
+                        <!-- Hidden Fields for Variation Details -->
+                        <input type="hidden" name="product_image" value="{{ item.image }}">
+                        <input type="hidden" name="cart_item_id" value="{{ item.id }}">
+                        <input type="hidden" name="product_id" value="{{ item.inventory_id }}"> <!-- Add inventory_id -->
+                        <input type="hidden" name="product_name" value="{{ item.name }}">
+                        <input type="hidden" name="product_price" value="{{ item.price }}">
+                        <input type="hidden" name="product_quantity" value="{{ item.quantity }}">
+                        <input type="hidden" name="product_total" value="{{ item.total }}">
+                        <input type="hidden" name="variation_name" value="{{ item.variation_name }}">
+                        <input type="hidden" name="variation_value" value="{{ item.variation_value }}">
+                        <input type="hidden" name="variation_attribute_id" value="{{ item.variation_attribute_id }}">
+                        
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No items in your cart to checkout.</p>
+            {% endif %}
+        
+            <!-- Hidden Field for Subtotal -->
+            <input type="hidden" name="subtotal" value="{{ total }}">
+                    
+            <div>
+                <h2>Your Information</h2>
+                    <label>Full Name:{{ info }}</label>
+            </div>
+            
+
+            <!-- Address Section -->
+            <h2>Delivery Address</h2>
+            <select name="address" required>
+                <option value="" disabled selected>Select Your Address</option>
+                {% if address %}
+                    <option value="{{ address }}" selected>{{ address }}</option>
+                {% endif %}
+            </select>
+            
+        
+            <!-- Payment Method Section -->
+            <h2>Payment Method</h2>
+            <select name="payment_method" required>
+                <option value="" disabled selected>Select Payment Method</option>
+                <option value="cod">Cash on Delivery (COD)</option>
+            </select>
+        
+            <!-- Checkout Summary -->
+            <div class="checkout-summary">
+                <p>Subtotal: ₱{{ total }}</p>
+                <p>Shipping Fee: ₱50.00</p>
+                <p><strong>Total: ₱{{ total + 50 }}</strong></p>
+            </div>
+        
+            <button type="submit" class="checkout-btn" onclick="return confirm('Confirm Order?');">Place Order</button>
+        </form>
+        
+    </div>
+</body>
+</html>

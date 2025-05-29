@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Boxicons -->
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<!-- My CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='admin_ban.css') }}">
+
+	<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+	<title>Pethub</title>
+</head>
+<body>
+
+
+	<section id="sidebar">
+		<a href="#" class="brand">
+			<img src="../static/assets/images/logo.png" alt="Logo" style="width: 230px; height: auto; display: block; margin: 10 auto;">
+			<span class="text"></span>
+		</a>
+		<ul class="side-menu top">
+			<li class="active">
+				<a href="{{ url_for('admin_dashboard') }}">
+					<i class='bx bxs-dashboard' ></i>
+					<span class="text">Dashboard</span>
+				</a>
+			</li>
+			<li>
+				<a href="{{ url_for('admin_management') }}">
+					<i class='bx bxs-shopping-bag-alt' ></i>
+					<span class="text">Management</span>
+				</a>
+			</li>
+			
+			
+		</ul>
+		<ul class="side-menu">
+			
+			<li>
+				<form action="{{ url_for('logout') }}" method="POST">
+                    <button type="submit" class="logout">
+                        <i class='bx bxs-log-out-circle'></i>
+                        <span class="text">Logout</span>
+                    </button>
+                </form>
+			</li>
+		</ul>
+	</section>
+	<!-- SIDEBAR -->
+
+
+
+	<!-- CONTENT -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu' ></i>
+			<a href="#" class="nav-link">Categories</a>
+			<form action="#">
+				<div class="form-input">
+					<input type="search" placeholder="Search...">
+					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+				</div>
+			</form>
+			<input type="checkbox" id="switch-mode" hidden>
+			<label for="switch-mode" class="switch-mode"></label>
+			<a href="#" class="notification">
+				<i class='bx bxs-bell' ></i>
+				<span class="num">8</span>
+			</a>
+			<a href="#" class="profile">
+				<img src="img/people.png">
+			</a>
+		</nav>
+		<!-- NAVBAR -->
+
+		<!-- MAIN -->
+		<main>
+			<div class="head-title">
+				<div class="left">
+					<h1>Management</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Management</a>
+						</li>
+						<li><i class='bx bx-chevron-right'></i></li>
+						<li>
+							<a class="active" href="{{ url_for('admin_management') }}">Home</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<ul class="box-info">
+			</ul>
+		
+			
+<!-- Combined Users Table with Role -->
+<div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+<div class="table-data">
+    <div class="order">
+        <div class="head">
+            <h3>User Management</h3>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Date Banned</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <!-- Corrected Image Path Handling -->
+                        <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ user[0]) }}" class="user-image" alt="Profile Picture">
+                    </td>
+                    <td>{{ user[1] }}</td>
+                    <td>{{ user[4] }}</td>
+                    <td>{{ user[2] if user[3] == 'temporary_ban' else 'N/A' }}</td>
+                    <td>
+                        {% if user[3] == 'temporary_ban' %}
+                        <!-- Unban Button -->
+                        <form method="POST" action="{{ url_for('admin_ban') }}">
+                            <input type="hidden" name="user_id" value="{{ user[5] }}">
+                            <button type="submit" name="action" value="unban" class="btn btn-success">Unban</button>
+                        </form>
+                        {% else %}
+                        <!-- Ban Button -->
+                        <button type="button" class="ban-button btn btn-danger" data-bs-toggle="modal" data-bs-target="#banModal{{ user[5] }}">Ban</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            
+                <!-- Ban Modal -->
+                <div class="modal fade" id="banModal{{ user[5] }}" tabindex="-1" aria-labelledby="banModalLabel{{ user[5] }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="banModalLabel{{ user[5] }}">Ban User</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="user-info">
+                                    <!-- Corrected Image Path in Modal -->
+                                    <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ user[0]) }}" class="user-image" alt="Profile Picture">
+                                    <p><strong>Name:</strong> {{ user[1] }}</p>
+                                </div>
+                                <form method="POST" action="{{ url_for('admin_ban') }}">
+                                    <input type="hidden" name="user_id" value="{{ user[5] }}">
+                                    
+                                    <!-- Dropdown for Common Ban Reasons -->
+                                    <div class="form-group">
+                                        <label for="banReasonDropdown{{ user[5] }}">Choose a Ban Reason:</label>
+                                        <select id="banReasonDropdown{{ user[5] }}" name="ban_reason" class="form-control" required>
+                                            <option value="">Select a Reason</option>
+                                            <option value="Violation of terms and conditions">Violation of terms and conditions</option>
+                                            <option value="Spamming or fraud">Spamming or fraud</option>
+                                            <option value="Abusive behavior">Abusive behavior</option>
+                                            <option value="Inappropriate content">Inappropriate content</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Input for Specific Ban Reason (only if "Other" is selected) -->
+                                    <div class="form-group" id="specificBanReasonDiv{{ user[5] }}" style="display:none;">
+                                        <label for="specificBanReason{{ user[5] }}">Specific Reason for Ban:</label>
+                                        <textarea id="specificBanReason{{ user[5] }}" name="specific_ban_reason" class="form-control" rows="3"></textarea>
+                                    </div>
+                                    
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" name="action" value="ban" class="btn btn-danger">Ban User</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+          
+
+
+
+<!-- Add JavaScript to show/hide the specific reason input -->
+<script>
+    document.getElementById('banReasonDropdown{{ user[5] }}').addEventListener('change', function() {
+        var selectedValue = this.value;
+        var specificBanReasonDiv = document.getElementById('specificBanReasonDiv{{ user[5] }}');
+        
+        if (selectedValue === 'Other') {
+            specificBanReasonDiv.style.display = 'block'; // Show specific reason input
+        } else {
+            specificBanReasonDiv.style.display = 'none'; // Hide specific reason input
+        }
+    });
+</script>
+
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+<!--wow-->
+
+<!-- Archive Users Table -->
+<div class="table-data">
+    <div class="order">
+        <div class="head">
+            <h3>Archived Users</h3>
+
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Date Archived</th>
+                    <th>Ban Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for archived_user in archived_users %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ archived_user[0]) }}" class="user-image" alt="Profile Picture">
+                    </td>
+                    <td>{{ archived_user[1] }}</td>
+                    <td>{{ archived_user[2] }}</td>
+                    <td>{{ archived_user[3] }}</td>
+                    <td>{{ archived_user[5] }}</td>
+                    <td>{{ archived_user[6] }}</td>
+                    <td>
+                        <td>
+                            <form method="POST" action="{{ url_for('permanent_ban') }}">
+                                <input type="hidden" name="user_id" value="{{ archived_user[4] }}">
+                                <button type="submit" class="ban-button btn btn-danger" onclick="return confirm('Are you sure you want to permanently ban this user?');">Permanent Ban</button>
+                            </form>
+                        </td>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+			
+			
+
+		
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btnBan = document.querySelector(".btn-ban");
+        const banModal = document.getElementById("banModal");
+        const closeBtn = document.querySelector(".modal .close");
+
+        // Show the modal when Ban button is clicked
+        btnBan.addEventListener("click", function (event) {
+            event.preventDefault();
+            banModal.style.display = "flex"; // Show modal with flex to center align
+        });
+
+        // Hide the modal when the close button is clicked
+        closeBtn.addEventListener("click", function () {
+            banModal.style.display = "none";
+        });
+
+        // Hide the modal when clicking outside the modal content
+        window.addEventListener("click", function (event) {
+            if (event.target === banModal) {
+                banModal.style.display = "none";
+            }
+        });
+    });
+</script>
+
+			
+			
+		</main>
+		
+		<!-- MAIN -->
+	</section>
+	<!-- CONTENT -->
+	
+
+	<script src="{{ url_for('static', filename='script3.js') }}"></script>
+</body>
+</html>

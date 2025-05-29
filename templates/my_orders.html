@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Primary Meta Tag -->
+  <title>PETHUB</title>
+  <meta name="title" content="PETHUB">
+  <meta name="description" content="">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="../static/assets/images/favicon.svg" type="image/svg+xml">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="../static/style.css">
+  <link rel="stylesheet" href="../static/my_orders.css">
+  <link href="https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Preload Images -->
+  <link rel="preload" as="image" href="../static/assets/images/hero-/banner.jpg">
+</head>
+<style>
+    body {
+    font-size: 16px; /* or any size you prefer */
+  }
+</style>
+
+<body id="top">
+  <!-- Header -->
+  <header class="header" data-header>
+    <div class="container">
+
+      <button class="nav-toggle-btn" aria-label="Toggle menu" data-nav-toggler>
+        <ion-icon name="menu-outline" aria-hidden="true" class="menu-icon"></ion-icon>
+        <ion-icon name="close-outline" aria-hidden="true" class="close-icon"></ion-icon>
+      </button>
+
+      <a href="#" class="logo">PETHUB</a>
+
+      <nav class="navbar" data-navbar>
+        <ul class="navbar-list">
+          <li class="navbar-item">
+            <a href="{{ url_for('index') }}" class="navbar-link" data-nav-link>Home</a>
+          </li>
+          <li class="navbar-item">
+            <a href="{{ url_for('index') }}" class="navbar-link" data-nav-link>Products</a>
+          </li>
+          <li class="navbar-item">
+            <a href="#" class="navbar-link" data-nav-link>My Orders</a>
+          </li>
+        </ul>
+
+        <a href="#" class="navbar-action-btn">Log In</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="action-btn" aria-label="Search">
+          <ion-icon name="search-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button class="action-btn user" aria-label="User">
+          <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
+        </button>
+        <button class="action-btn" aria-label="Cart" onclick="window.location.href='/cart'">
+          <ion-icon name="bag-handle-outline" aria-hidden="true"></ion-icon>
+          <span class="btn-badge">0</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="tabs">
+      <div class="tab active" data-status="all">All</div>
+      <div class="tab" data-status="Pending">Pending</div>
+      <div class="tab" data-status="Confirmed">Confirmed</div>
+      <div class="tab" data-status="Preparing To Pack">Preparing to Pack</div>
+      <div class="tab" data-status="Order Packed">Packed</div>
+      <div class="tab" data-status="Waiting for Pick up">To Pick-up</div>
+      <div class="tab" data-status="Order Picked up">Order Picked up</div>
+      <div class="tab" data-status="Out for Delivery">To Receive</div>
+      <div class="tab" data-status="Delivered">Delivered</div>
+      <div class="tab" data-status="Received">Completed</div>
+      <div class="tab" data-status="Cancelled">Cancelled</div>
+  </div>
+    <div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+              <ul>
+                  {% for category, message in messages %}
+                      <li class="{{ category }}">{{ message }}</li>
+                  {% endfor %}
+              </ul>
+          {% endif %}
+      {% endwith %}
+    </div>
+    <div>
+      <table class="order-table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Details</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Price</th>
+                <th>Delivery Address</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                {% for order_item in order.items %}
+                <tr class="order-item" data-status="{{ order_item.status }}">
+                    <td>
+                        <img src="{{ url_for('static', filename='uploads/profile_pics/' + order_item.product_image) }}" alt="{{ order_item.product_name }}">
+                    </td>
+                    <td>
+                        <strong>{{ order_item.product_name }}</strong><br>
+                        ID: {{ order_item.id }}<br>
+                        Variation: {{ order_item.variation_name }}: {{ order_item.variation_value }}
+                    </td>
+                    <td>{{ order_item.quantity }}</td>
+                    <td>₱{{ order_item.product_price }}</td>
+                    <td>₱{{ order_item.total }}</td>
+                    <td>{{ order.address }}</td>
+                    <td>{{ order_item.status }}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#orderItemsModal-{{ order_item.id }}">Details</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+  </div>
+    {% for order in orders %}
+      {% for order_item in order.items %}
+      <!-- Modal for Specific Order Item -->
+      <div class="modal fade" id="orderItemsModal-{{ order_item.id }}" tabindex="-1" aria-labelledby="orderItemModalLabel-{{ order_item.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="buyer-modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="orderItemModalLabel-{{ order_item.id }}">Order Item ID: {{ order_item.id }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="product-image">
+                <img src="{{ url_for('static', filename='uploads/profile_pics/' + order_item.product_image) }}" alt="{{ order_item.product_name }}" style="width: 100%; height: auto;">
+              </div>
+              <div class="product-details">
+                <h5>{{ order_item.product_name }}</h5>
+                <p><strong>Variation:</strong> {{ order_item.variation_name }}: {{ order_item.variation_value }}</p>
+                <p><strong>Quantity:</strong> {{ order_item.quantity }}</p>
+                <p><strong>Unit Price:</strong> ₱{{ order_item.product_price }}</p>
+                <p><strong>Total Price:</strong> ₱{{ order_item.total }}</p>
+                <p><strong>Delivery Address:</strong> {{ order.address }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Status:</strong> {{ order_item.status }}</p>
+                {% if order_item.status == 'Delivered' and order_item.proof_image %}
+                  <div class="mt-3">
+                    <p><strong>Proof of Delivery:</strong></p>
+                    <img src="{{ url_for('static', filename='proof_images/' + order_item.proof_image) }}"
+                        alt="Proof of Delivery"
+                        style="width: 100%; height: auto; border-radius: 8px; border: 1px solid #ccc;">
+                  </div>
+                {% endif %}
+
+              </div>
+              <div class="actions mt-3">
+                <button class="btn btn-danger mt-3" id="cancelOrder-{{ order_item.id }}" {% if order_item.status not in ['Pending', 'Confirmed'] %} disabled {% endif %}>
+                  Cancel Order
+                </button>
+                <button class="btn btn-approve mt-3" id="markOrderReceived-{{ order_item.id }}" {% if order_item.status not in ['Delivered'] %} disabled {% endif %}>
+                  Order Received
+                </button>
+                <button class="btn btn-info mt-3" id="addFeedback-{{ order_item.id }}" data-bs-toggle="modal" data-bs-target="#feedbackModal-{{ order_item.id }}" {% if order_item.status != 'Received' %} disabled {% endif %}>
+                  Add Feedback
+                </button>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+  
+      <!-- Feedback Modal (Inside the loop) -->
+      <div class="modal fade" id="feedbackModal-{{ order_item.id }}" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="feedbackModalLabel">Add Feedback</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <!-- Feedback Form -->
+              <form action="{{ url_for('submit_feedback', order_id=order_item.id) }}" method="POST" enctype="multipart/form-data" id="feedbackForm-{{ order_item.id }}">
+                <div class="form-group">
+                  <label for="comment-{{ order_item.id }}">Comment</label>
+                  <textarea class="form-control" id="comment-{{ order_item.id }}" name="comment" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="rating-{{ order_item.id }}">Rating</label>
+                  <select class="form-control" id="rating-{{ order_item.id }}" name="rating" required>
+                    <option value="1">1 Star</option>
+                    <option value="2">2 Stars</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="photo-{{ order_item.id }}">Upload Photo</label>
+                  <input type="file" class="form-control" id="photo-{{ order_item.id }}" name="photo" accept="image/*">
+                </div>
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Submit Feedback?');">Submit Feedback</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      
+      </div>
+       
+      <!-- Cancel Order Modal -->
+      <div class="modal fade" id="cancelOrderModal-{{ order_item.id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel-{{ order_item.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="cancelOrderModalLabel-{{ order_item.id }}">Cancel Order - Order ID: {{ order.id }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="cancelOrderForm-{{ order_item.id }}" method="POST">
+                <div class="form-group">
+                  <label for="cancellationReason-{{ order_item.id }}">Reason for Cancellation</label>
+                  <select class="form-control" id="cancellationReason-{{ order_item.id }}" name="cancellation_reason" required>
+                    <option value="">Select a reason</option>
+                    <option value="Changed mind">Changed mind</option>
+                    <option value="Item not needed">Item not needed</option>
+                    <option value="Found a better price">Found a better price</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-danger" id="submitCancel-{{ order_item.id }}" onclick="return confirm('Are you sure you want to cancel your order?');">Cancellation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %} 
+    {% endfor %} 
+  </main>
+  
+
+  <!-- Scripts -->
+  <script src="../static/script.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Confirm Order buttons
+    const confirmButtons = document.querySelectorAll('.btn-primary.mt-3');
+    confirmButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.id.split('-')[1];
+            confirmOrder(orderId);
+        });
+    });
+
+    // Cancel Order buttons
+    const cancelButtons = document.querySelectorAll('.btn-danger.mt-3');
+    cancelButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.id.split('-')[1];
+            openCancelOrderModal(orderId);
+        });
+    });
+
+    // Order Received buttons
+    const orderReceivedButtons = document.querySelectorAll('.btn-approve.mt-3');
+    orderReceivedButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.id.split('-')[1];
+            markOrderReceived(orderId);
+        });
+    });
+
+    // Add Feedback buttons
+    const addFeedbackButtons = document.querySelectorAll('.btn-feedback');
+    addFeedbackButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const orderId = this.id.split('-')[1];
+            showFeedbackModal(orderId);
+        });
+    });
+
+    // Confirm Order
+    function confirmOrder(orderId) {
+        fetch(`/confirm_order/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ order_id: orderId })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order confirmed!');
+                    document.getElementById(`confirmOrder-${orderId}`).disabled = true;
+                } else {
+                    alert('Failed to confirm order. Please try again later.');
+                }
+            })
+            .catch(error => {
+                alert('Error confirming the order.');
+            });
+    }
+
+    // Open Cancel Order Modal
+    function openCancelOrderModal(orderId) {
+        const cancelModal = new bootstrap.Modal(document.getElementById(`cancelOrderModal-${orderId}`));
+        cancelModal.show();
+
+        const submitButton = document.getElementById(`submitCancel-${orderId}`);
+        submitButton.addEventListener('click', function () {
+            const reason = document.getElementById(`cancellationReason-${orderId}`).value;
+            if (reason) {
+                cancelOrder(orderId, reason);
+            } else {
+                alert('Please select a reason for cancellation.');
+            }
+        });
+    }
+
+    // Cancel Order with reason
+    function cancelOrder(orderId, reason) {
+        fetch(`/cancel_order/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ order_id: orderId, cancellation_reason: reason })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order canceled successfully.');
+                    document.getElementById(`cancelOrder-${orderId}`).disabled = true;
+                    const cancelModal = bootstrap.Modal.getInstance(document.getElementById(`cancelOrderModal-${orderId}`));
+                    cancelModal.hide();
+                } else {
+                    alert('Failed to cancel the order. Please try again later.');
+                }
+            })
+            .catch(error => {
+                alert('Error canceling the order.');
+                console.error(error);
+            });
+    }
+
+    // Mark Order as Received
+    function markOrderReceived(orderId) {
+        fetch(`/mark_order_received/${orderId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Order received!');
+                    document.getElementById(`markOrderReceived-${orderId}`).disabled = true;
+                } else {
+                    alert('Failed to mark the order as received.');
+                }
+            })
+            .catch(error => {
+                alert('Error marking the order as received.');
+            });
+    }
+
+    // Show Feedback Modal
+    function showFeedbackModal(orderId) {
+        const feedbackModal = new bootstrap.Modal(document.getElementById(`feedbackModal-${orderId}`));
+        feedbackModal.show();
+
+        const feedbackForm = document.getElementById(`feedbackForm-${orderId}`);
+        feedbackForm.onsubmit = function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(feedbackForm);
+            formData.append('order_id', orderId);
+
+            fetch(`/submit_feedback/${orderId}`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Feedback submitted successfully!');
+                        feedbackModal.hide();
+                    } else {
+                        alert('Failed to submit feedback.');
+                    }
+                })
+                .catch(error => {
+                    alert('Error submitting feedback.');
+                    console.error(error);
+                });
+        };
+    }
+});
+
+ // Get all tabs and the table rows
+ const tabs = document.querySelectorAll('.tab');
+    const rows = document.querySelectorAll('.order-item');
+
+    // Add click event listener to each tab
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove 'active' class from all tabs and add to the clicked tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Get the status from the clicked tab
+            const status = tab.getAttribute('data-status');
+
+            // Loop through all rows and show or hide based on the selected status
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                if (status === 'all' || rowStatus === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Optional: If you want to show all orders by default
+    document.querySelector('.tab.active').click();
+</script>
+
+</html>

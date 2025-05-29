@@ -1,0 +1,105 @@
+/* General Section Styling */
+.seller-info-section {
+    background-color: #f9f9f9; /* Light background for contrast */
+    padding: 30px 15px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.seller-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-picture img {
+    width: 120px; /* Fixed size for profile picture */
+    height: 120px;
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover; /* Ensure the image fits well */
+    border: 3px solid #ddd; /* Add a border around the image */
+}
+
+
+
+.shop-info-section {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.shop-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 1150px;
+    background-color: #fff;
+}
+
+.shop-image img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    margin-right: 15px;
+}
+
+.shop-details {
+    flex: 1;
+    text-align: left;
+}
+
+.shop-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+.seller-name {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.shop-status {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.active-status {
+    font-weight: bold;
+    color: green;
+}
+
+.offline-status {
+    font-weight: bold;
+    color: red;
+}
+
+.shop-actions {
+    display: flex;
+    margin-top: 10px;
+}
+
+.chat-now-btn,
+.view-shop-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.chat-now-btn {
+    background-color: #ff5722;
+    color: #fff;
+}
+
+.chat-now-btn:hover {
+    background-color: #e64a19;
+}

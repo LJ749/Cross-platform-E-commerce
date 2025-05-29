@@ -1,0 +1,257 @@
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Boxicons -->
+		<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+		<!-- My CSS -->
+		<link rel="stylesheet" href="../static/seller_style.css">
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+		<title>PETHUB</title>
+	</head>
+	<body>
+		<!-- SIDEBAR -->
+		<section id="sidebar">
+			<a href="#" class="brand">
+				<img src="../static/assets/images/logo.png" alt="Logo" style="width: 290px; height: auto; display: block; margin: 10 auto;">
+				<span class="text"></span>
+			</a>
+			<ul ul class="side-menu top">
+				<li class="active">
+					<a href="{{ url_for('seller_home') }}">
+						<i class='bx bxs-dashboard'></i>
+						<span class="text">Dashboard</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_inventory') }}">
+						<i class='bx bxs-shopping-bag-alt'></i>
+						<span class="text">Inventory</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_orders') }}">
+						<i class='bx bxs-shopping-bag-alt'></i>
+						<span class="text">Orders</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_sales') }}">
+						<i class='bx bxs-doughnut-chart'></i>
+						<span class="text">Sales</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_feedback') }}">
+						<i class='bx bxs-message-dots'></i>
+						<span class="text">Feedbacks</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_messages') }}">
+						<i class='bx bxs-message-dots'></i>
+						<span class="text">Message</span>
+					</a>
+				</li>
+				<li>
+					<form action="{{ url_for('logout') }}" method="POST">
+						<button type="submit" class="logout">
+							<i class='bx bxs-log-out-circle'></i>
+							<span class="text">Logout</span>
+						</button>
+					</form>
+				</li>
+			</ul>
+		</section>
+		<!-- SIDEBAR -->
+
+
+
+		<!-- CONTENT -->
+		<section id="content">
+			<!-- NAVBAR -->
+			<nav>
+				<i class='bx bx-menu' ></i>
+				<a href="#" class="nav-link">Categories</a>
+				<form action="#">
+					<div class="form-input">
+						<input type="search" placeholder="Search...">
+						<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+					</div>
+				</form>
+
+				<input type="checkbox" id="switch-mode" hidden>
+				<label for="switch-mode" class="switch-mode"></label>
+				<a href="#" class="notification" onclick="toggleDropdown(event)">
+					<i class='bx bxs-bell'></i>
+					<span class="num" id="notificationCount">0</span>
+				</a>
+				
+				<!-- Custom Dropdown Modal -->
+				<div class="custom-dropdown" id="notificationDropdown">
+					<div class="dropdown-header">
+						<h5>Notifications</h5>
+					</div>
+					<ul id="notificationList" class="list-group">
+						<li class="list-group-item">No new notifications.</li>
+					</ul>
+				</div>
+
+				<a href="#" class="profile">
+					<img src="{{ profile_picture_url }}" alt="Profile">
+				</a>
+			</nav>
+			<!-- NAVBAR -->
+
+			<!-- MAIN -->
+			<main>
+				<div class="head-title">
+					<div class="left">
+						<h1>Dashboard</h1>
+						<ul class="breadcrumb">
+							<li>
+								<a href="#">Dashboard</a>
+							</li>
+							<li><i class='bx bx-chevron-right' ></i></li>
+							<li>
+								<a class="active" href="#">Home</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<ul class="box-info">
+					<li>
+						<i class='bx bxs-calendar-check' ></i>
+						<span class="text">
+							<h3>{{ total_orders }}</h3>
+							<p>Orders</p>
+						</span>
+					</li>
+					<li>
+						<i class='bx bxs-group' ></i>
+						<span class="text">
+							<h3>{{ total_stocks }}</h3>
+							<p>Stocks</p>
+						</span>
+					</li>
+					<li>
+						<i class='bx bxs-dollar-circle' ></i>
+						<span class="text">
+							<h3>{{ total_received }}</h3>
+							<p>Total Sales</p>
+						</span>
+					</li>
+				</ul>
+
+				<div class="table-responsive">
+					<h1>Inventory</h1>
+					<table class="table">
+						<thead>
+							<tr>
+								<th scope="col">Product Picture</th>
+								<th scope="col">Product Name</th>
+								<th scope="col">Price</th>
+								<th scope="col">Quantity</th>
+								<th scope="col">Category</th>
+								<th scope="col">Details</th>
+								<th scope="col">Variations</th> <!-- Added Variations Column -->
+							</tr>
+						</thead>
+						<tbody>
+							{% for product in products %}
+							<tr>
+								<td class="centered-cell">
+									<img src="{{ url_for('static', filename='uploads/profile_pics/' ~ product.product_picture) }}" alt="{{ product.product_name }}" style="width: 100px; height: auto;">
+								</td>                           
+								<td class="centered-cell">{{ product.product_name }}</td>
+								<td class="centered-cell">{{ product.price }}</td>
+								<td class="centered-cell">{{ product.quantity }}</td>
+								<td class="centered-cell">{{ product.category }}</td>
+								<td class="centered-cell">{{ product.details|truncate(30, True) }}</td>
+								<td class="centered-cell">
+									{% if product.variations %}
+										<ul>
+											{% for variation in product.variations %}
+												<li>{{ variation.attribute_name }}: {{ variation.attribute_value }}</li>
+											{% endfor %}
+										</ul>
+									{% else %}
+										No Variations
+									{% endif %}
+								</td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</main>
+			<!-- MAIN -->
+		</section>
+		<!-- CONTENT -->
+		 <script> 
+					function toggleDropdown(event) {
+			event.preventDefault();
+			const dropdown = document.getElementById('notificationDropdown');
+			dropdown.classList.toggle('show');
+			loadNotifications(); // Load notifications when dropdown is opened
+		}
+
+		function markAsRead(notificationId) {
+			fetch(`/notifications/mark_as_read/${notificationId}`, {
+				method: 'POST',
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// Reload notifications or update the UI to reflect the new status
+					loadNotifications();  // This function can reload the notifications list
+				}
+			})
+			.catch(error => console.error('Error marking notification as read:', error));
+		}
+
+		function loadNotifications() {
+			fetch('/seller_notifications')
+				.then(response => response.json())
+				.then(data => {
+					const notificationList = document.getElementById('notificationList');
+					notificationList.innerHTML = '';  // Clear the existing list
+
+					data.forEach(notification => {
+						const li = document.createElement('li');
+						const link = document.createElement('a');
+						link.href = `/seller/orders`;  // Or wherever the notification links to
+						link.textContent = `${notification.message}`;
+
+						// Apply a class based on the read/unread status
+						if (notification.status === 'unread') {
+							li.classList.add('unread');
+						} else {
+							li.classList.add('read');
+						}
+
+						// When the notification is clicked, mark it as read
+						link.addEventListener('click', () => {
+							markAsRead(notification.id);  // Pass the notification ID to mark it as read
+						});
+
+						li.appendChild(link);
+						notificationList.appendChild(li);
+					});
+				})
+				.catch(error => console.error('Error loading notifications:', error));
+		}
+
+		// Attach to modal open event
+		document.getElementById('notificationDropdown').addEventListener('shown.bs.dropdown', markNotificationsAsRead);
+		 </script>
+		
+
+		<script src="../static/script1.js"></script>
+	</body>
+	</html>

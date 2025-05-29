@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="../static/cart.css">
+    <link rel="shortcut icon" href="../static/assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Carter+One&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header" data-header>
+        <div class="container">
+            <!-- Navigation Code -->
+        </div>
+    </header>
+
+    <div class="cart-container">
+        <h1>Shopping Cart</h1>
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <form action="/checkout" method="POST" class="cart-form">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Product</th>
+                        <th>Variation</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in carts %}
+                        <tr id="cart-item-{{ item.id }}">
+                            <td class="select">
+                                <input type="checkbox" name="product_ids" value="{{ item.id }}" class="checkout-checkbox" checked>
+                            </td>
+                            <td class="product">
+                                <img src="{{ url_for('static', filename='uploads/profile_pics/' ~ item.product_picture) }}" alt="{{ item.name }}" style="width:100px;height:auto;" onerror="this.style.display='none';">
+                                <span>{{ item.name }}</span>
+                            </td>
+                            <td class="variation-info">
+                                <span class="variation-name">{{ item.variation_name }}</span>: 
+                                <span class="variation-value">{{ item.variation_value }}</span>
+                            </td>
+                            <td class="price">₱<span class="item-price">{{ item.price }}</span></td>
+                            <td class="quantity">
+                                <input type="number" name="quantity_{{ item.id }}" value="{{ item.quantity }}" min="1" class="quantity-input" data-item-id="{{ item.id }}">
+                            </td>
+                            <td class="total">₱<span class="item-total">{{ item.total }}</span></td>
+                            <td class="remove">
+                                <button type="button" class="remove-btn" onclick="removeItem('{{ item.id }}')">Remove</button>
+                            </td>     
+                            <input type="hidden" name="inventory_id" value="{{ item.inventory_id }}">                  
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7">No items in the cart.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>                
+            </table>
+        
+            <div class="cart-summary">
+                <p>Total: <span>₱<span class="total-price">{{ total }}</span></span></p>
+                <button type="submit" class="checkout-btn" onclick="return confirm('Proceed to Checkout?');">Proceed to Checkout</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="../static/assets/js/script.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+            const checkboxes = document.querySelectorAll('.checkout-checkbox');
+            const totalPriceElement = document.querySelector('.total-price');
+    
+            function updateCartSummary() {
+                let subtotal = 0;
+    
+                quantityInputs.forEach(input => {
+                    const quantity = parseInt(input.value) || 0; // Get quantity, default to 0 if invalid
+                    const itemPrice = parseFloat(input.closest('tr').querySelector('.item-price').innerText.replace('₱', '').replace(',', ''));
+                    const itemTotal = quantity * itemPrice;
+    
+                    // Update the individual item total display
+                    input.closest('tr').querySelector('.item-total').innerText = itemTotal.toFixed(2);
+    
+                    // Check if the checkbox is checked to include in subtotal
+                    const checkbox = input.closest('tr').querySelector('.checkout-checkbox');
+                    if (checkbox.checked) {
+                        subtotal += itemTotal;
+                    }
+                });
+    
+                // Update total price
+                totalPriceElement.innerText = subtotal.toFixed(2);
+            }
+    
+            // Check stock availability when the quantity changes
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', function () {
+                    const itemId = input.getAttribute('data-item-id');
+                    const newQuantity = parseInt(input.value);
+    
+                    if (newQuantity < 1) {
+                        alert("Quantity must be at least 1.");
+                        input.value = 1;  // Set the quantity back to 1 if the user enters less than 1
+                        return;
+                    }
+    
+                    // Send an AJAX request to check stock availability for the selected variation
+                    fetch(`/check_stock/${itemId}/${newQuantity}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                updateCartSummary();
+                            } else {
+                                alert(data.message);
+                                input.value = data.current_quantity;  // Restore the quantity to the current value
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking stock:', error);
+                            alert("An error occurred while checking stock availability.");
+                        });
+                });
+            });
+    
+            // Add event listeners for checkboxes
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateCartSummary);
+            });
+    
+            // Initial calculation on page load
+            updateCartSummary();
+        });
+    </script>
+    
+</body>
+</html>

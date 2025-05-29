@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- My CSS -->
+    <link rel="stylesheet" href="../static/seller_style.css">
+    <link rel="stylesheet" href="../static/seller_orders.css">
+    <title>PETHUB</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+      
+</head>
+<body>
+    <!-- SIDEBAR -->
+		<section id="sidebar">
+			<a href="#" class="brand">
+                <img src="../static/assets/images/logo.png" alt="Logo" style="width: 290px; height: auto; display: block; margin: 10 auto;">
+				<span class="text"></span>
+			</a>
+			<ul ul class="side-menu top">
+				<li>
+					<a href="{{ url_for('seller_home') }}">
+						<i class='bx bxs-dashboard'></i>
+						<span class="text">Dashboard</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_inventory') }}">
+						<i class='bx bxs-shopping-bag-alt'></i>
+						<span class="text">Inventory</span>
+					</a>
+				</li>
+				<li class="active">
+					<a href="{{ url_for('seller_orders') }}">
+						<i class='bx bxs-shopping-bag-alt'></i>
+						<span class="text">Orders</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_sales') }}">
+						<i class='bx bxs-doughnut-chart'></i>
+						<span class="text">Sales</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_feedback') }}">
+						<i class='bx bxs-message-dots'></i>
+						<span class="text">Feedbacks</span>
+					</a>
+				</li>
+				<li>
+					<a href="{{ url_for('seller_messages') }}">
+						<i class='bx bxs-message-dots'></i>
+						<span class="text">Message</span>
+					</a>
+				</li>
+				<li>
+					<form action="{{ url_for('logout') }}" method="POST">
+						<button type="submit" class="logout">
+							<i class='bx bxs-log-out-circle'></i>
+							<span class="text">Logout</span>
+						</button>
+					</form>
+				</li>
+			</ul>
+		</section>
+		<!-- SIDEBAR -->
+
+    <section id="content">
+        <!-- NAVBAR -->
+        <nav>
+            <i class='bx bx-menu'></i>
+            <a href="#" class="nav-link">Orders</a>
+            <form action="#">
+                <div class="form-input">
+                    <input type="search" placeholder="Search...">
+                    <button type="submit" class="search-btn"><i class='bx bx-search'></i></button>
+                </div>
+            </form>
+            <input type="checkbox" id="switch-mode" hidden>
+            <label for="switch-mode" class="switch-mode"></label>
+            <a href="#" class="notification">
+                <i class='bx bxs-bell'></i>
+                <span class="num">8</span>
+            </a>
+            <a href="#" class="profile">
+                <img src="{{ profile_picture_url }}" alt="Profile">
+            </a>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main>
+            <div class="tabs">
+                <div class="tab active" data-status="all">All</div>
+                <div class="tab" data-status="Pending">Pending</div>
+                <div class="tab" data-status="Confirmed">Confirmed</div>
+                <div class="tab" data-status="Preparing To Pack">Preparing to Pack</div>
+                <div class="tab" data-status="Order Packed">Packed</div>
+                <div class="tab" data-status="Waiting for Pick up">To Pick-up</div>
+                <div class="tab" data-status="Order Picked up">Order Picked up</div>
+                <div class="tab" data-status="Out for Delivery">To Receive</div>
+                <div class="tab" data-status="Delivered">Delivered</div>
+                <div class="tab" data-status="Received">Completed</div>
+                <div class="tab" data-status="Cancelled">Cancelled</div>
+            </div>
+			<div class="head-title">
+				<div class="left">
+					<h1>Orders</h1>
+				</div>
+			</div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% endwith %}
+        
+                <table class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Product Image</th>
+                            <th>Customer</th>
+                            <th>Product Name</th>
+                            <th>Variation</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order, profile_picture, firstname, middlename, lastname in orders %}
+                            {% for order_item in order.items %}
+                                    <tr class="order-item" data-status="{{ order_item.status }}">
+                                        <td>{{ order_item.id }}</td>
+                                        <td>
+                                            <img src="{{ url_for('static', filename='uploads/profile_pics/' + order_item.product_image) }}" 
+                                                 alt="{{ order_item.product_name }}" style="width: 70px; height: auto;">
+                                        </td>
+                                        <td>
+                                            <img src="{{ url_for('static', filename='uploads/profile_pics/' + profile_picture) }}" 
+                                                 alt="{{ order_item.product_name }}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">  {{ firstname }} {{ middlename }} {{ lastname }}
+                                        </td>
+                                        <td>{{ order_item.product_name }}</td>
+                                        <td>{{ order_item.variation_name }}: {{ order_item.variation_value }}</td>
+                                        <td>{{ order_item.quantity }}</td>
+                                        <td>₱{{ order_item.product_price }}</td>
+                                        <td>₱{{ order_item.total }}</td>
+                                        <td>{{ order_item.status }}</td>
+                                        <td>
+                                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#orderItemsModal-{{ order_item.id }}">
+                                                View Details
+                                            </button>
+                                        </td>
+                                    </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody> 
+                </table>
+            </div>
+  
+                    <!-- Modal for Order Items -->
+                    {% for order, profile_picture, firstname, middlename, lastname in orders %}
+                    {% for order_item in order.items %}
+                    <div class="modal fade" id="orderItemsModal-{{ order_item.id }}" tabindex="-1" aria-labelledby="orderItemsModalLabel-{{ order_item.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Order Details - Order ID: {{ order.id }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="order-items">
+                                       
+                                            <div class="order-item-card">
+                                                <h5>Order Item ID: {{ order_item.id }}</h5>
+                                                <div class="product-image">
+                                                    <img src="{{ url_for('static', filename='uploads/profile_pics/' + order_item.product_image) }}" alt="{{ order_item.product_name }}">
+                                                </div>
+                                                <div class="product-details">
+                                                    <h5>{{ order_item.product_name }}</h5>
+                                                    <p>Variation: {{ order_item.variation_name }}: {{ order_item.variation_value }}</p>
+                                                    <p>Quantity: {{ order_item.quantity }}</p>
+                                                    <p>Unit Price: ₱{{ order_item.product_price }}</p>
+                                                    <p>Total Price: ₱{{ order_item.total }}</p>
+                                                    <p>Payment Method:: {{ order.payment_method }}</p>
+                                                    <p>Delivery Address: {{ order.address }}</p>
+                                                    <p>Status: {{ order_item.status }}</p>
+                                                    <p>Updated at: {{ order_item.status_changed_at }}</p>
+                                                    <p>Tracking Number: {{ order_item.tracking_number }}</p>
+                                                    <p>Delivery Rider: {{ order_item.ridername }}</p>
+                                                    <!-- Status Update Form -->
+                                                    <form method="POST" action="{{ url_for('update_order_status') }}">
+                                                        <input type="hidden" name="order_item_id" value="{{ order_item.id }}">
+                                                        <select name="new_status" class="form-select">
+                                                            <option value="Confirmed" {% if order_item.status not in ['Pending'] %}disabled{% endif %}>Confirm</option>
+                                                            <option value="Preparing To Pack" {% if order_item.status not in ['Confirmed'] %}disabled{% endif %}>Preparing to Pack</option>
+                                                            <option value="Order Packed" {% if order_item.status not in ['Preparing To Pack'] %}disabled{% endif %}>Order Packed</option>
+                                                        </select>
+                                                        <button type="submit" class="btn btn-primary mt-3">Update Status</button>
+                                                        <!-- Cancel Order Button that opens the cancellation modal -->
+                                                        
+                                                    </form>
+                                                    <form method="POST"
+                                                            action="{{ url_for('assign_rider', item_id=order_item.id) }}">
+                                                        <label for="rider_id">Assign Rider:</label>
+                                                    
+                                                        <select
+                                                        id="rider_id"
+                                                        name="rider_id"
+                                                        class="form-control"
+                                                        {% if order_item.status != 'Order Packed' %}disabled{% endif %}
+                                                        >
+                                                        <option value="">-- Select a Rider --</option>
+                                                        {% for r in riders %}
+                                                            <option value="{{ r.id }}">
+                                                            {{ r.firstname }} {{ r.lastname }}
+                                                            ({{ r.province }}{% if r.city %}, {{ r.city }}{% endif %})
+                                                            </option>
+                                                        {% endfor %}
+                                                        </select>
+                                                    
+                                                        {% if order_item.status == 'Order Packed' %}
+                                                        <button type="submit" class="btn btn-primary mt-2">
+                                                            Confirm Rider Assignment
+                                                        </button>
+                                                        {% else %}
+                                                        <small class="text-muted">
+                                                            Assignments open once status is “Order Packed.”
+                                                        </small>
+                                                        {% endif %}
+                                                    </form>
+                                                    
+                                                    
+                                                    <button class="btn btn-danger mt-3" data-bs-toggle="modal" data-bs-target="#cancelOrderModal-{{ order_item.id }}" {% if order_item.status not in ['Pending', 'Confirmed', 'Preparing To Ship'] %} disabled {% endif %}>
+                                                        Cancel Order
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% endfor %}
+
+                {% for order, profile_picture, firstname, middlename, lastname in orders %}
+                {% for order_item in order.items %}
+                    <div class="modal fade" id="cancelOrderModal-{{ order_item.id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel-{{ order_item.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cancelOrderModalLabel-{{ order_item.id }}">Cancel Order</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="cancelOrderForm-{{ order_item.id }}" method="POST">
+                                        <div class="form-group">
+                                            <label for="cancellationReason-{{ order_item.id }}">Reason for Cancellation</label>
+                                            <select class="form-control" id="cancellationReason-{{ order_item.id }}" name="cancellation_reason" required>
+                                                <option value="">Select a reason</option>
+                                                <option value="Out Of Stock">Out Of Stock</option>
+                                                <option value="Item not Available">Item not Available</option>
+                                                <option value="Wrong Item Shipped">Wrong Item Shipped</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-danger" id="submitCancel-{{ order_item.id }}" 
+                                            onclick="submitCancelOrder('{{ order_item.id }}')">
+                                        Confirm Cancellation
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}   
+
+        </main>
+    <script>
+        // Function to open the modal and set product details
+        function openProductDetailsModal(orderItemId) {
+            const orderItem = document.getElementById(`order-item-${orderItemId}`);
+
+            const productImage = orderItem.querySelector('.product-image img').src;
+            const productName = orderItem.querySelector('.product-details h5').innerText;
+            const productVariation = orderItem.querySelector('.product-details p:nth-of-type(3)').innerText;
+            const productQuantity = orderItem.querySelector('.product-details p:nth-of-type(4)').innerText;
+            const productUnitPrice = orderItem.querySelector('.product-details p:nth-of-type(5)').innerText;
+            const productTotalPrice = orderItem.querySelector('.product-details p:nth-of-type(6)').innerText;
+            const productStatus = orderItem.querySelector('.product-details p:nth-of-type(7)').innerText;
+
+            // Set the values in the modal
+            document.getElementById('modalProductImage').src = productImage;
+            document.getElementById('modalProductName').innerText = productName;
+            document.getElementById('modalProductVariation').innerText = productVariation;
+            document.getElementById('modalProductQuantity').innerText = productQuantity;
+            document.getElementById('modalProductUnitPrice').innerText = productUnitPrice;
+            document.getElementById('modalProductTotalPrice').innerText = productTotalPrice;
+            document.getElementById('modalProductStatus').innerText = productStatus.trim();
+
+            // Set the order item ID for updating status
+            document.getElementById('modalOrderItemId').value = orderItemId;
+
+            // Set the current status in the dropdown
+            const statusDropdown = document.getElementById('modalOrderStatus');
+            statusDropdown.value = productStatus.trim().toLowerCase();
+
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('productDetailsModal'));
+            modal.show();
+        }
+
+        // Cancel Order buttons
+        const cancelButtons = document.querySelectorAll('.btn-danger.mt-3');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const orderId = this.id.split('-')[1];
+                openCancelOrderModal(orderId);
+            });
+        });
+
+        function openCancelOrderModal(orderId) {
+            const cancelModal = new bootstrap.Modal(document.getElementById(`cancelOrderModal-${orderId}`));
+            cancelModal.show();
+        }
+
+        function submitCancelOrder(orderId) {
+            const reasonElement = document.getElementById(`cancellationReason-${orderId}`);
+            const reason = reasonElement.value;
+
+            if (!reason) {
+                alert('Please select a reason for cancellation.');
+                return;
+            }
+
+            fetch(`/seller_cancel_order/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ order_id: orderId, cancellation_reason: reason }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert('Order canceled successfully.');
+                        document.getElementById(`cancelOrder-${orderId}`).disabled = true;
+                        const cancelModal = bootstrap.Modal.getInstance(document.getElementById(`cancelOrderModal-${orderId}`));
+                        cancelModal.hide();
+                    } else {
+                        alert('Failed to cancel the order. Please try again later.');
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+   
+        document.querySelectorAll('.btn-info').forEach(button => {
+            button.addEventListener('click', function() {
+                const orderId = this.getAttribute('data-order-id');
+                openProductDetailsModal(orderId);
+            });
+        });
+
+        // Get all tabs and the table rows
+        const tabs = document.querySelectorAll('.tab');
+            const rows = document.querySelectorAll('.order-item');
+
+            // Add click event listener to each tab
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove 'active' class from all tabs and add to the clicked tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    // Get the status from the clicked tab
+                    const status = tab.getAttribute('data-status');
+
+                    // Loop through all rows and show or hide based on the selected status
+                    rows.forEach(row => {
+                        const rowStatus = row.getAttribute('data-status');
+                        if (status === 'all' || rowStatus === status) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // Optional: If you want to show all orders by default
+            document.querySelector('.tab.active').click();
+
+    </script>
+    
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</body>
+</html>

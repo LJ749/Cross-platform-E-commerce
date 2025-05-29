@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <link rel="stylesheet" href="../static/styles.css"> <!-- Update with your actual CSS file path -->
+    <script>
+        let resendTimer = 30;  // Timer for 30 seconds
+
+        function startResendTimer() {
+            const resendLink = document.getElementById("resend-link");
+            resendLink.style.pointerEvents = "none";  // Disable link during the timer
+            resendLink.innerHTML = "Resend OTP (" + resendTimer + "s)";
+
+            const timerInterval = setInterval(function() {
+                resendTimer--;
+                resendLink.innerHTML = "Resend OTP (" + resendTimer + "s)";
+
+                if (resendTimer <= 0) {
+                    clearInterval(timerInterval);
+                    resendLink.style.pointerEvents = "auto";  // Re-enable link after timer ends
+                    resendLink.innerHTML = "Resend OTP";  // Reset text
+                    resendTimer = 30;  // Reset the timer for the next resend
+                }
+            }, 1000);
+        }
+
+        // Call this function when the page loads
+        window.onload = function() {
+            startResendTimer();
+        };
+    </script>
+</head>
+<body>
+    <div class="form-card">
+        <h1>Verify Your OTP</h1>
+
+        <!-- Display flash messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="alert">
+                    <ul>
+                        {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('verify_otp', email=email) }}">
+            <input type="text" name="otp" required placeholder="Enter your OTP" maxlength="6">
+            <input type="submit" value="Verify OTP">
+        </form>
+
+        <!-- Form for resending OTP -->
+        <form method="POST" action="{{ url_for('resend_otp') }}">
+            <input type="hidden" name="email" value="{{ email }}">
+            <p>Didn't receive the OTP? <button type="submit" id="resend-link">Resend OTP</button></p>
+        </form>
+    </div>
+</body>
+</html>

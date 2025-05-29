@@ -1,0 +1,376 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Container for the product details */
+.container {
+    max-width: 1200px; /* Or adjust this value as per your layout */
+    margin: 0 auto;  /* Ensures it's centered */
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Wrapper for the product details */
+.product-detail-wrapper {
+    display: flex;
+    gap: 40px;
+    background-color: #fff;
+    /*padding: 30px;*/
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Product Image */
+.product-image {
+    flex: 1;
+    max-width: 500px;
+}
+
+.product-image img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* Product Info */
+.product-info {
+    flex: 2;
+}
+
+.product-name {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.product-price {
+    font-size: 1.8em;
+    color: #e67e22;
+    margin-bottom: 20px;
+}
+
+.product-details {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.product-quantity,
+.product-category,
+.shop-name {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.product-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+}
+
+.btn {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add-to-cart {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-buy-now {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Hover effects */
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-add-to-cart:hover {
+    background-color: #2980b9;
+}
+
+.btn-buy-now:hover {
+    background-color: #c0392b;
+}
+
+.quantity-form {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-input {
+    display: flex;
+    align-items: center;
+}
+
+.quantity-input input {
+    width: 50px;  /* Adjust width as needed */
+    text-align: center; /* Center the text */
+    margin: 0 10px; /* Space around the input */
+}
+
+.btn-icon {
+    background: none;  /* Remove default button styling */
+    border: none;  /* Remove border */
+    cursor: pointer;  /* Pointer cursor */
+    font-size: 24px;  /* Adjust icon size */
+    color: #007bff;  /* Icon color */
+}
+
+.btn-icon:hover {
+    color: #0056b3;  /* Change color on hover */
+}
+
+.variant-selection {
+    margin-top: 15px;
+}
+
+.variation {
+    margin-bottom: 10px;
+}
+
+.variation-options {
+    display: flex;
+    gap: 10px;
+}
+
+.variation-options label {
+    cursor: pointer;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.variation-options label:hover {
+    background-color: #f0f0f0;
+}
+
+.variation-options input[type="radio"] {
+    display: none;
+}
+
+.variation-options input[type="radio"]:checked + span {
+    background-color: #ff5a5f;
+    color: white;
+    border-color: #ff5a5f;
+}
+
+.product-variations {
+    margin-top: 20px; /* Add spacing above the variations section */
+}
+
+.variation-group {
+    margin-bottom: 15px; /* Spacing between different variation groups */
+}
+
+.label {
+    display: block; /* Keep label on a new line */
+    margin-bottom: 5px; /* Space between label and buttons */
+}
+
+.variation-buttons {
+    display: flex; /* Use flexbox to arrange buttons in a row */
+    flex-wrap: wrap; /* Allow buttons to wrap if the space is limited */
+    gap: 10px; /* Spacing between buttons */
+}
+
+.variation-button {
+    padding: 10px 15px; /* Add padding for buttons */
+    border: 1px solid #ccc; /* Border styling */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f8f8f8; /* Button background color */
+    cursor: pointer; /* Pointer on hover */
+    transition: background-color 0.3s; /* Smooth background change */
+}
+
+.variation-button:hover {
+    background-color: #e0e0e0; /* Change color on hover */
+}
+
+.variation-name.selected, .variation-button.selected {
+    background-color: #007BFF; /* Example color */
+    color: white; /* Change text color for visibility */
+}
+
+.feedback-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.feedback-section h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.feedback-item {
+    margin-bottom: 20px;
+}
+
+.feedback-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rating i {
+    color: #f3d57b;
+}
+
+.rating i.filled {
+    color: #f39c12;
+}
+
+.feedback-image {
+    width: 100px;
+    height: auto;
+    margin-top: 10px;
+}
+
+.feedback-form {
+    margin-top: 30px;
+}
+
+.feedback-form h3 {
+    margin-bottom: 15px;
+}
+
+.rating-input {
+    display: flex;
+    gap: 5px;
+}
+
+.rating-input input {
+    display: none;
+}
+
+.rating-input label {
+    cursor: pointer;
+    color: #ccc;
+}
+
+.rating-input input:checked ~ label,
+.rating-input label:hover,
+.rating-input label:hover ~ label {
+    color: #ffc107;
+}
+
+.shop-info-section {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.shop-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 1150px;
+    background-color: #fff;
+}
+
+.shop-image img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    margin-right: 15px;
+}
+
+.shop-details {
+    flex: 1;
+    text-align: left;
+}
+
+.shop-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+.seller-name {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.shop-status {
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.active-status {
+    font-weight: bold;
+    color: green;
+}
+
+.offline-status {
+    font-weight: bold;
+    color: red;
+}
+
+.shop-actions {
+    display: flex;
+    margin-top: 10px;
+}
+
+.chat-now-btn,
+.view-shop-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.chat-now-btn {
+    background-color: #ff5722;
+    color: #fff;
+}
+
+.chat-now-btn:hover {
+    background-color: #e64a19;
+}
+
+.view-shop-btn {
+    background-color: #fff;
+    color: #555;
+}
+
+.view-shop-btn:hover {
+    background-color: #f5f5f5;
+}
+
+
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .product-detail-wrapper {
+        flex-direction: column;
+    }
+}

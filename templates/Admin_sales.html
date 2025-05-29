@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<!-- Boxicons -->
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- My CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='admin_sales.css') }}">
+
+	<title>Pethub</title>
+</head>
+<body>
+
+
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="#" class="brand">
+			<img src="../static/assets/images/logo.png" alt="Logo" style="width: 290px; height: auto; display: block; margin: 10 auto;">
+			<span class="text">PETHUB</span>
+		</a>
+		<ul class="side-menu top">
+			<li>
+				<a href="{{ url_for('admin_dashboard') }}">
+					<i class='bx bxs-dashboard' ></i>
+					<span class="text">Dashboard</span>
+				</a>
+			</li>
+			<li>
+				<a href="{{ url_for('admin_management') }}">
+					<i class='bx bxs-shopping-bag-alt' ></i>
+					<span class="text">Management</span>
+				</a>
+			</li>
+			<li class="active">
+				<a href="{{ url_for('admin_sales') }}">
+					<i class='bx bxs-doughnut-chart' ></i>
+					<span class="text">Sales Report</span>
+				</a>
+			</li>
+			<li>
+				<a href="#">
+					<i class='bx bxs-message-dots' ></i>
+					<span class="text">Message</span>
+				</a>
+			</li>
+			
+		</ul>
+		<ul class="side-menu">
+			<li>
+				<a href="#">
+					<i class='bx bxs-cog' ></i>
+					<span class="text">Settings</span>
+				</a>
+			</li>
+			<li>
+				<a href="#" class="logout">
+					<i class='bx bxs-log-out-circle' ></i>
+					<span class="text">Logout</span>
+				</a>
+			</li>
+		</ul>
+	</section>
+	<!-- SIDEBAR -->
+
+
+
+	<!-- CONTENT -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu' ></i>
+			<a href="#" class="nav-link">Categories</a>
+			<form action="#">
+				<div class="form-input">
+					<input type="search" placeholder="Search...">
+					<button type="submit" class="search-btn"><i class='bx bx-search' ></i></button>
+				</div>
+			</form>
+			<input type="checkbox" id="switch-mode" hidden>
+			<label for="switch-mode" class="switch-mode"></label>
+			<a href="#" class="notification">
+				<i class='bx bxs-bell' ></i>
+				<span class="num">8</span>
+			</a>
+			<a href="#" class="profile">
+				<img src="img/people.png">
+			</a>
+		</nav>
+		<!-- NAVBAR -->
+
+		<!-- MAIN -->
+		<main>
+			<div class="head-title">
+				<div class="left">
+					<h1>Sales Report</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a href="#">Dashboard</a>
+						</li>
+						<li><i class='bx bx-chevron-right' ></i></li>
+						<li>
+							<a class="active" href="#">Home</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div>
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						<ul>
+							{% for category, message in messages %}
+								<li class="{{ category }}">{{ message }}</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				{% endwith %}
+			</div>
+
+			<ul class="box-info">
+				<li>
+					<i class='bx bxs-calendar-check' ></i>
+					<span class="text">
+						<h3>{{ completed_count }}</h3>
+						<p>Completed Delivery</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-group'></i>
+						<span class="text">
+    						<h3>{{ pending_count }}</h3>  <!-- Dynamic count of Pending status -->
+    					<p>Pending</p>
+					</span>
+				</li>
+				<li>
+					<i class='bx bxs-dollar-circle' ></i>
+					<span class="text">
+						<h3>{{ total_commission }}</h3>
+						<p>Total Commission</p>
+					</span>
+				</li>
+			</ul>
+
+<!-- Chart -->
+
+<div class="todo">
+    <h1>Sales Report: Buyer and Seller Distribution</h1>
+
+    <!-- Pie Chart Form Container -->
+    <div class="order">
+        <div class="head">
+            <h3>Distribution of Buyers and Sellers</h3>
+        </div>
+
+        <!-- Pie Chart Container -->
+        <div id="chartData" data-seller="{{ sellers_count }}" data-buyer="{{ buyers_count }}">
+            <canvas id="pieChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- Bar Graph for Monthly Sales -->
+    <div class="order">
+        <div class="head">
+            <h3>Monthly Sales</h3>
+        </div>
+
+        <!-- Bar Chart Container -->
+        <div id="monthlySalesData" data-monthly-sales="{{ monthly_sales }}">
+            <canvas id="barChart" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chartDataDiv = document.getElementById("chartData");
+            const sellerCount = parseInt(chartDataDiv.getAttribute("data-seller"));
+            const buyerCount = parseInt(chartDataDiv.getAttribute("data-buyer"));
+
+            // Data for Pie Chart
+            const pieData = {
+                labels: ['Buyers', 'Sellers'],
+                datasets: [{
+                    data: [buyerCount, sellerCount],
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.5)',  // Blue for Buyers
+                        'rgba(255, 99, 132, 0.5)'   // Red for Sellers
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            // Configuration for Pie Chart
+            const pieConfig = {
+                type: 'pie',
+                data: pieData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribution of Buyers and Sellers'
+                        }
+                    }
+                }
+            };
+
+            // Initialize Pie Chart
+            new Chart(document.getElementById('pieChart'), pieConfig);
+
+            // Monthly Sales Data (example format: "January:200,February:300,...")
+            const monthlySalesData = document.getElementById("monthlySalesData").getAttribute("data-monthly-sales").split(",");
+            const salesLabels = monthlySalesData.map(data => data.split(":")[0]); // Extract month names
+            const salesValues = monthlySalesData.map(data => parseInt(data.split(":")[1])); // Extract sales values
+
+            // Data for Bar Chart
+            const barData = {
+                labels: salesLabels,
+                datasets: [{
+                    label: 'Monthly Sales',
+                    data: salesValues,
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            };
+
+            // Configuration for Bar Chart
+            const barConfig = {
+                type: 'bar',
+                data: barData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Monthly Sales'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            };
+
+            // Initialize Bar Chart
+            new Chart(document.getElementById('barChart'), barConfig);
+        });
+    </script>
+</div>
+
+
+			
+<!-- transaction -->
+			<div class="table-data">
+				<div class="order">
+					<div class="head">
+						<h3>Transactions</h3> <!-- Changed section title -->
+						<i class='bx bx-search'></i>
+						<i class='bx bx-filter'></i>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>User</th>
+								<th>Seller</th>
+								<th>Product Variant</th>
+								<th>Price</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<img src="img/user1.png" alt="User Image"> <!-- User Image -->
+									<p>Michael Brown</p>
+								</td>
+								<td>
+									<img src="img/seller1.png" alt="Seller Image"> <!-- Seller Image -->
+									<p>Seller A</p>
+								</td>
+								<td>Product D</td>
+								<td class="price">$120.00</td>
+								<td><span class="status completed">Completed</span></td>
+							</tr>
+							<tr>
+								<td>
+									<img src="img/user2.png" alt="User Image"> <!-- User Image -->
+									<p>Emily Davis</p>
+								</td>
+								<td>
+									<img src="img/seller2.png" alt="Seller Image"> <!-- Seller Image -->
+									<p>Seller B</p>
+								</td>
+								<td>Product E</td>
+								<td class="price">$90.00</td>
+								<td><span class="status pending">Pending</span></td>
+							</tr>
+							<tr>
+								<td>
+									<img src="img/user3.png" alt="User Image"> <!-- User Image -->
+									<p>Daniel Wilson</p>
+								</td>
+								<td>
+									<img src="img/seller3.png" alt="Seller Image"> <!-- Seller Image -->
+									<p>Seller C</p>
+								</td>
+								<td>Product F</td>
+								<td class="price">$80.00</td>
+								<td><span class="status process">Process</span></td>
+							</tr>
+						</tbody>
+					</table>
+					
+				</div>
+				
+<!-- most sales -->
+
+				<div class="order">
+					<div class="head">
+						<h3>Most Selling Products</h3> <!-- New section title -->
+						<i class='bx bx-search'></i>
+						<i class='bx bx-filter'></i>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>Product</th>
+								<th>Product Variant</th>
+								<th>Price</th>
+								<th>Commission</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for item in order_data %}
+							<tr>
+								<td>
+									<img src="{{ item.product_image }}" alt="Product Image">
+									<p>{{ item.product_name }}</p>
+								</td>
+								<td>{{ item.variation_name }}</td>
+								<td class="price">₱{{ item.product_price }}</td>
+								<td class="commission">₱{{ item.commission }}</td>
+								<td><span class="status {{ item.status }}">{{ item.status }}</span></td>
+							</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					
+					
+			<!--		<table>
+						<thead>
+							<tr>
+								<th>User</th>
+								<th>Product Variant</th>
+								<th>Price</th>
+								<th>Commission</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<img src="img/people.png">
+									<p>Michael Brown</p>
+								</td>
+								<td>Product D</td>
+								<td class="price">$120.00</td>
+								<td class="commission"></td>
+								<td><span class="status completed">Completed</span></td>
+							</tr>
+							<tr>
+								<td>
+									<img src="img/people.png">
+									<p>Emily Davis</p>
+								</td>
+								<td>Product E</td>
+								<td class="price">$90.00</td>
+								<td class="commission"></td>
+								<td><span class="status pending">Pending</span></td>
+							</tr>
+							<tr>
+								<td>
+									<img src="img/people.png">
+									<p>Daniel Wilson</p>
+								</td>
+								<td>Product F</td>
+								<td class="price">$80.00</td>
+								<td class="commission"></td>
+								<td><span class="status process">Process</span></td>
+							</tr>
+						</tbody>
+					</table>  -->
+				</div>
+				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+				</div>
+			</div>
+		</main>
+		<!-- MAIN -->
+	</section>
+	<!-- CONTENT -->
+	
+
+	<script src="{{ url_for('static', filename='script3.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Product Inventory</h1>
+
+        <!-- Display total stocks -->
+        <div class="alert alert-info">
+            Total Stocks: {{ total_stocks }}
+        </div>
+
+        <!-- Product Cards -->
+        <div class="row">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <img class="card-img-top" src="{{ url_for('static', filename='uploads/profile_pics/' + product['product_picture']) }}" alt="Product Image">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ product['product_name'] }}</h4>
+                        <h5>${{ product['price'] }}</h5>
+                        <p class="card-text">{{ product['details'] }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Category: {{ product['category'] }}</small><br>
+                        <small class="text-muted">Quantity: {{ product['quantity'] }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

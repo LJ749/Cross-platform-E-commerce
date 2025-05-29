@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <link rel="stylesheet" href="../static/regstyle.css">
+</head>
+<body>
+    <div class="form-card">
+        <!-- Logo in the center -->
+        <img src="{{ url_for('static', filename='uploads/profile_pics/logo.png') }}" alt="logo" class="logo">
+
+        <h2>Registration Form</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('register') }}" method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstname">First Name</label>
+                    {{ form.firstname(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="middlename">Middle Name</label>
+                    {{ form.middlename(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="lastname">Last Name</label>
+                    {{ form.lastname(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="birthdate">Birthdate</label>
+                    {{ form.birthdate(class="form-control", type="date") }} <!-- Birthdate as Date Picker -->
+                </div>
+                <div class="form-group">
+                    <label for="sex">Sex</label>
+                    {{ form.sex(class="form-control") }} <!-- Sex as Dropdown -->
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="region">Region</label>
+                    <select id="region" class="form-control">
+                        <option selected disabled>Choose Region</option>
+                    </select>
+                    <input type="hidden" id="region-text" name="region">
+                </div>
+            
+                <div class="form-group">
+                    <label for="province">Province</label>
+                    <select id="province" class="form-control">
+                        <option selected disabled>Choose Province</option>
+                    </select>
+                    <input type="hidden" id="province-text" name="province">
+                </div>
+            
+                <div class="form-group">
+                    <label for="city">City/Municipality</label>
+                    <select id="city" class="form-control">
+                        <option selected disabled>Choose City/Municipality</option>
+                    </select>
+                    <input type="hidden" id="city-text" name="city">
+                </div>
+            
+                <div class="form-group">
+                    <label for="barangay">Barangay</label>
+                    <select id="barangay" class="form-control">
+                        <option selected disabled>Choose Barangay</option>
+                    </select>
+                    <input type="hidden" id="barangay-text" name="barangay">
+                </div>
+                <div class="form-group">
+                    <label for="street">Street</label>
+                    {{ form.street(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    <label for="house number">House Number</label>
+                    {{ form.housenumber(class="form-control") }}
+                </div>
+            </div>
+            
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                {{ form.email(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                {{ form.password(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm Password</label>
+                {{ form.confirm_password(class="form-control") }} <!-- Confirm Password Field -->
+            </div>
+
+            <div class="form-group">
+                <label for="role">Role</label>
+                {{ form.role(class="form-control", id="role", onchange="toggleShopName()") }} <!-- Role as Dropdown -->
+            </div>
+
+            <div class="form-group">
+                <label for="shop_name">Shop Name</label>
+                {{ form.shop_name(class="form-control", id="shopName", disabled=True, placeholder="Enter your shop name") }}<br>
+            </div>
+
+            <div class="form-group">
+                <label for="profile_picture">Profile Picture</label>
+                {{ form.profile_picture(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                <label for="valid-id">Upload Valid ID</label>
+                {{ form.valid_id(class="form-control") }}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+
+    <script>
+        function toggleShopName() {
+            const roleSelect = document.getElementById('role');
+            const shopNameInput = document.getElementById('shopName');
+
+            if (roleSelect.value === 'Seller') {
+                shopNameInput.disabled = false;
+                shopNameInput.classList.remove('disabled');
+            } else {
+                shopNameInput.disabled = true;
+                shopNameInput.classList.add('disabled');
+                shopNameInput.value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const apiBase = 'https://psgc.cloud/api'; // Replace with your API URL
+
+            const regionDropdown = document.getElementById('region');
+            const provinceDropdown = document.getElementById('province');
+            const cityDropdown = document.getElementById('city');
+            const barangayDropdown = document.getElementById('barangay');
+
+            // Populate Regions
+            fetch(`${apiBase}/regions`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(region => {
+                        const option = document.createElement('option');
+                        option.value = region.code;
+                        option.textContent = region.name;
+                        regionDropdown.appendChild(option);
+                    });
+                });
+
+            // Handle Region Change
+            regionDropdown.addEventListener('change', function () {
+                const selectedRegion = regionDropdown.value;
+                document.getElementById('region-text').value = regionDropdown.options[regionDropdown.selectedIndex].text;
+
+                // Clear dependent dropdowns
+                provinceDropdown.innerHTML = '<option selected disabled>Choose Province</option>';
+                cityDropdown.innerHTML = '<option selected disabled>Choose City/Municipality</option>';
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch provinces for the selected region
+                fetch(`${apiBase}/regions/${selectedRegion}/provinces`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(province => {
+                            const option = document.createElement('option');
+                            option.value = province.code;
+                            option.textContent = province.name;
+                            provinceDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle Province Change
+            provinceDropdown.addEventListener('change', function () {
+                const selectedProvince = provinceDropdown.value;
+                document.getElementById('province-text').value = provinceDropdown.options[provinceDropdown.selectedIndex].text;
+
+                // Clear dependent dropdowns
+                cityDropdown.innerHTML = '<option selected disabled>Choose City/Municipality</option>';
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch cities/municipalities for the selected province
+                fetch(`${apiBase}/provinces/${selectedProvince}/cities-municipalities`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(city => {
+                            const option = document.createElement('option');
+                            option.value = city.code;
+                            option.textContent = city.name;
+                            cityDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle City Change
+            cityDropdown.addEventListener('change', function () {
+                const selectedCity = cityDropdown.value;
+                document.getElementById('city-text').value = cityDropdown.options[cityDropdown.selectedIndex].text;
+
+                // Clear dependent dropdown
+                barangayDropdown.innerHTML = '<option selected disabled>Choose Barangay</option>';
+
+                // Fetch barangays for the selected city
+                fetch(`${apiBase}/cities-municipalities/${selectedCity}/barangays`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(barangay => {
+                            const option = document.createElement('option');
+                            option.value = barangay.code;
+                            option.textContent = barangay.name;
+                            barangayDropdown.appendChild(option);
+                        });
+                    });
+            });
+
+            // Handle Barangay Change
+            barangayDropdown.addEventListener('change', function () {
+                document.getElementById('barangay-text').value = barangayDropdown.options[barangayDropdown.selectedIndex].text;
+            });
+        });
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+/* Style for the product card */
+.product-list {
+    display: flex;
+    flex-wrap: wrap;  /* Allow the items to wrap to the next row */
+    flex-direction: row;
+    gap: 20px;  /* Optional: space between the cards */
+    padding: 10px;
+    
+    
+}
+
+.product-card {
+    display: flex;
+    flex-direction: row;  /* Set layout to row to display content horizontally */
+    justify-content: center;
+    align-items: center;
+    width: 350px; /* Set width */
+    height: 300px; /* Match height to width for a square card */
+    max-width: 1000px; /* Optional: Set a max width for responsiveness */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    margin: 10px 0;
+    font-size: large;
+}
+
+
+
+.product-image {
+    width: 150px;  /* Fixed width for image */
+    height: 150px; /* Fixed height for image */
+    flex-shrink: 0; /* Prevent image from shrinking */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.order-container{
+    display: flex;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Ensures the image covers the whole container */
+}
+
+.product-details {
+    flex-grow: 1;  /* Allow details to take the remaining space */
+    padding: 10px;
+    font-size: 14px;
+}
+
+.product-details h5 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.product-details p {
+    margin: 5px 0;
+}
+
+.product-card button {
+    margin-top: 10px;
+}
+
+/* Optional: Adjust the modal image size to fit within the modal */
+.modal-body img {
+    width: 100%;
+    height: auto;
+}
+
+.order-details {
+    font-size: large;
+}
+
+.order-items {
+    display: flex;
+    flex-wrap: wrap; /* Optional: allows items to wrap if needed */
+    gap: 20px;
+}
+
+.order-container {
+    display: flex;
+    flex-wrap: wrap; /* Optional: allows items to wrap if needed */
+    gap: 20px; /* Adjust spacing between items */
+
+}
+
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 2px solid #ddd;
+}
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    text-align: center;
+    color: #333;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    color: #ff5722;
+}
+
+.tab.active {
+    color: #ff5722;
+    border-bottom: 2px solid #ff5722;
+}
+
